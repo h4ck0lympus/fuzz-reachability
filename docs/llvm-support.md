@@ -87,10 +87,13 @@ independent of SVF.
    normal maintenance path and requires no local patching.
 
 2. **Pin the whole toolchain to an SVF-supported LLVM.** If you need SVF *now*,
-   build the entire analyzer toolchain on LLVM 21 (`make build-svf LLVM_MAJOR=21`)
-   and run analyses there. Coherence is preserved because clang/llvm-link/opt/
-   analyzer are all 21 and rustc is 21. Use newer LLVM only for runs where the
-   type-based backend suffices.
+   build on LLVM 21: `make build-svf` already pins LLVM 21 by default (the only
+   version SVF builds against), independent of the auto-selected core default.
+   Coherence holds when clang/llvm-link/opt/analyzer are all 21 and rustc's LLVM
+   is ≤ 21; if the distro LLVM 21 is an older patch release than rustc (the case
+   on this machine: 21.0.0 < 21.1.1), SVF can read C/C++ bitcode but not rustc's,
+   so SVF is usable for C/C++ runs only. Use newer LLVM for the type-based
+   backend otherwise.
 
 3. **Local patch (last resort, brittle).** The two known breakages are simple
    renames (`findDbgDeclares`→`findDVRDeclares`, `DITypeRefArray`→`DITypeArray`),

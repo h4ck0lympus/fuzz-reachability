@@ -197,8 +197,11 @@ LLVM 22/23 the core type-based backend is fully functional and `--backend=svf`
 returns a clear error rather than degrading silently. Build it with:
 
 ```bash
-make build-svf LLVM_MAJOR=21    # builds the SVF dependency + an SVF-enabled analyzer
+make build-svf                  # builds the SVF dependency + an SVF-enabled analyzer
 ```
+
+`make build-svf` pins LLVM 21 (the only version SVF builds against) regardless of
+the auto-selected core default; pass `LLVM_MAJOR=<n>` to force a different one.
 
 See [`docs/llvm-support.md`](docs/llvm-support.md) for the compatibility matrix
 and the full fallback plan.
