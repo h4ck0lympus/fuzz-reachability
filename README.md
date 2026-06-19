@@ -10,6 +10,7 @@ reached" — not dynamic coverage. It works uniformly for C, C++, and Rust
 unreachable. Over-approximation is expected; under-approximation is a bug.
 
 - **LLVM version support + SVF fallback plan:** [`docs/llvm-support.md`](docs/llvm-support.md)
+- **ziggy fuzz harness (Rust `main` entry):** [`docs/ziggy.md`](docs/ziggy.md)
 
 Author: Marc "vanHauser" Heuse
 License: GNU Affero General Public License 3 or newer
@@ -19,8 +20,8 @@ License: GNU Affero General Public License 3 or newer
 ```
  driver (Python)            analyzer (C++ / LLVM)
  ───────────────            ─────────────────────
- acquire bitcode  ─┐
-   C/C++ : gllvm    │  llvm-link    load .bc → call graph → indirect resolve
+   acquire bitcode ─┐
+   C/C++ : gllvm    │  llvm-link      load .bc → call graph → indirect resolve
    Rust  : rustc    ├─► merge .bc ─►  (type-based | SVF) → BFS from entry →
    --emit=llvm-bc  ─┘                 JSON report (+ optional DOT)
 ```
@@ -41,7 +42,7 @@ License: GNU Affero General Public License 3 or newer
 - **Go** (to install `gllvm`), **Python ≥ 3.12**, **rustc/cargo** (nightly for
   Rust targets), a C++17 compiler.
 
-## Build (no CMake)
+## Build
 
 The analyzer builds with a plain Makefile driven by `llvm-config`.
 
@@ -132,6 +133,26 @@ The trait-object call resolves to both impls (v0-demangled), via indirect edges:
 > `LLVMFuzzerTestOneInput` glue calling an `extern "C"` Rust entry. Use
 > `--lang mixed`; the cross-language edge resolves by C ABI symbol name once both
 > sides' bitcode is merged.
+
+### 4. A ziggy harness (Rust `main` entry)
+
+A [ziggy](https://github.com/srlabs/ziggy) harness is a Rust **bin** crate whose
+fuzz loop lives in `ziggy::fuzz!(|data| { … })` inside `fn main()` — so the entry
+is the **Rust `main`**, not `LLVMFuzzerTestOneInput`. Root the analysis at the
+*mangled* Rust `main` (the bare `main` is a C-ABI shim that dead-ends in
+precompiled `std`):
+
+```bash
+cd <harness>
+RUSTFLAGS="--emit=llvm-bc -Cembed-bitcode=yes -Ccodegen-units=1" cargo build
+llvm-link-22 target/debug/deps/*.bc -o merged.bc
+main=$(llvm-nm-22 --defined-only target/debug/deps/<bin>-*.bc | grep ' T ' | grep main)  # pick <crate>::main
+reachability-analyzer merged.bc --entry "$main" --out reach.json \
+  --reached-out reached.txt --not-reached-out not_reached.txt
+```
+
+Full walkthrough, gotchas (custom `rustflags`, workspace target dirs, finding the
+symbol), and a worked move-smith example: [`docs/ziggy.md`](docs/ziggy.md).
 
 ## Output
 
