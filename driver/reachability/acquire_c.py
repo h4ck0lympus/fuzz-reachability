@@ -22,6 +22,34 @@ def _build_env(clang_bindir: str) -> dict:
     return env
 
 
+def detect_build_cmd(project_dir):
+    """Pick a build command for a C/C++ project by probing for the well-known
+    build files, in the order configure -> make -> cmake -> ninja -> meson, with
+    an autotools-bootstrap fallback. Returns a shell command string, or None if
+    nothing is recognized (the caller then falls back to plain `make`). The
+    gllvm wrappers are injected via CC/CXX, which every build system below
+    honours at configure time, so the chosen command embeds bitcode regardless.
+    """
+    def has(*names):
+        return any(os.path.exists(os.path.join(project_dir, n)) for n in names)
+
+    if has("configure"):
+        return "./configure && make"
+    if has("Makefile", "makefile", "GNUmakefile"):
+        return "make"
+    if has("CMakeLists.txt"):
+        return "cmake -S . -B build && cmake --build build"
+    if has("build.ninja"):
+        return "ninja"
+    if has("meson.build"):
+        return "meson setup build && ninja -C build"
+    if has("autogen.sh"):
+        return "./autogen.sh && ./configure && make"
+    if has("configure.ac", "configure.in"):
+        return "autoreconf -i && ./configure && make"
+    return None
+
+
 def acquire_c_bitcode(project_dir, tc, artifact, build_cmd=None):
     """Build `project_dir` with gllvm wrappers and extract `<artifact>.bc`.
 

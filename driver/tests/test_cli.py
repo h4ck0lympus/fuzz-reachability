@@ -11,7 +11,10 @@ HAVE_GLLVM = shutil.which("gclang") is not None
 
 
 def test_target_entry_defaults():
-    # harness target types imply their default entry; parser accepts them.
+    # source languages and harness target types each imply their default entry.
+    assert cli.TARGETS["c"] == ("c", ["main", "LLVMFuzzerTestOneInput"])
+    assert cli.TARGETS["cpp"] == ("cpp", ["main", "LLVMFuzzerTestOneInput"])
+    assert cli.TARGETS["rust"] == ("rust", ["main"])
     assert cli.TARGETS["ziggy"] == ("rust", ["main"])
     assert cli.TARGETS["afl"] == ("rust", ["main"])
     assert cli.TARGETS["libfuzzer"] == ("rust", ["fuzz_target!"])

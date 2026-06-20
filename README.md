@@ -182,7 +182,7 @@ point(s).
 | `--entry NAME` | per `--lang` | Entry function to root reachability at. **Repeatable.** Overrides the target default. Accepts a mangled symbol, a demangled name, a `::name` suffix (e.g. `main`), or the alias `fuzz_target!` — no mangled name required. |
 | `--backend {type-based,svf}` | `type-based` | Indirect-call resolution backend. `svf` needs an SVF-enabled analyzer (`make build-svf`). |
 | `--artifact PATH` | `main.o` | C/C++ only: the built object/binary `get-bc` extracts whole-program bitcode from (relative to `--project`). |
-| `--build-cmd CMD` | `make` | C/C++ only: shell build command, run with gllvm wrappers injected. E.g. `"cmake -S . -B build && cmake --build build"`. |
+| `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with gllvm wrappers injected. E.g. `"cmake -S . -B build && cmake --build build"`. If omitted, the build system is auto-detected from the project files (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, with an autotools-bootstrap fallback), defaulting to `make`. |
 | `--build-std` | off | Rust only: build the standard library from source too (`-Zbuild-std`), so std functions appear in the graph instead of as external declarations. |
 | `--dot FILE` | *(none)* | Also write the reachable subgraph as Graphviz DOT (indirect edges dashed/red). |
 | `--reached FILE` | `reached.txt` next to `--out` | Path for the sancov **allowlist** of reachable functions. |
@@ -194,17 +194,19 @@ default entry:
 
 | `--lang` | acquires via | default entry |
 |----------|--------------|---------------|
-| `c` | gllvm (`gclang`) | `LLVMFuzzerTestOneInput` |
-| `cpp` | gllvm (`gclang++`) | `LLVMFuzzerTestOneInput` |
-| `rust` | `cargo` + `--emit=llvm-bc` | `LLVMFuzzerTestOneInput` |
+| `c` | gllvm (`gclang`) | `main` + `LLVMFuzzerTestOneInput` |
+| `cpp` | gllvm (`gclang++`) | `main` + `LLVMFuzzerTestOneInput` |
+| `rust` | `cargo` + `--emit=llvm-bc` | `main` |
 | `mixed` | gllvm **and** cargo (merged) | `LLVMFuzzerTestOneInput` |
 | `libfuzzer` | cargo (Rust) | `fuzz_target!` (→ `LLVMFuzzerTestOneInput` + `rust_fuzzer_test_input`) |
 | `ziggy` | cargo (Rust) | `main` |
 | `afl` | cargo (Rust) | `main` |
 
-The harness targets (`libfuzzer`/`ziggy`/`afl`) are the Rust shapes; a C/C++
-libFuzzer or afl harness uses `--lang c`/`cpp` (default `LLVMFuzzerTestOneInput`,
-or `--entry main` for a C afl harness).
+The C/C++ targets root at both `main` and `LLVMFuzzerTestOneInput`, so the same
+`--lang c`/`cpp` covers a normal program and a libFuzzer harness without an
+`--entry`; a default that matches nothing in the module is a harmless warning
+(roots are unioned). The harness targets (`libfuzzer`/`ziggy`/`afl`) are the Rust
+shapes.
 
 **Entry resolution.** `--entry` never requires a mangled symbol. A token matches,
 unioned across all of: an exact mangled symbol; an exact demangled name; a

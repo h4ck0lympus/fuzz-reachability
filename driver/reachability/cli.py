@@ -15,13 +15,15 @@ from . import acquire_c, acquire_rust, analyze, link, report, toolchain
 # fuzz-harness shape (which also implies the default entry point). Each maps to
 # (acquire mode, default entries). Entries are resolved flexibly by the analyzer
 # (mangled, demangled, '::name' suffix, or the 'fuzz_target!' alias), so harness
-# targets never need a mangled symbol. libfuzzer/ziggy/afl are the Rust harness
-# shapes; C/C++ libfuzzer or afl use --lang c/cpp (default LLVMFuzzerTestOneInput,
-# or --entry main for a C afl harness).
+# targets never need a mangled symbol. C/C++ default to both `main` and
+# `LLVMFuzzerTestOneInput`, covering a normal program and a libFuzzer harness;
+# plain Rust defaults to `main`. A default that matches nothing is a harmless
+# warning (roots are unioned), so a target with only one of them still analyzes.
+# libfuzzer/ziggy/afl are the Rust harness shapes.
 TARGETS = {
-    "c":         ("c",     ["LLVMFuzzerTestOneInput"]),
-    "cpp":       ("cpp",   ["LLVMFuzzerTestOneInput"]),
-    "rust":      ("rust",  ["LLVMFuzzerTestOneInput"]),
+    "c":         ("c",     ["main", "LLVMFuzzerTestOneInput"]),
+    "cpp":       ("cpp",   ["main", "LLVMFuzzerTestOneInput"]),
+    "rust":      ("rust",  ["main"]),
     "mixed":     ("mixed", ["LLVMFuzzerTestOneInput"]),
     "libfuzzer": ("rust",  ["fuzz_target!"]),
     "ziggy":     ("rust",  ["main"]),
@@ -42,9 +44,14 @@ def _acquire(args, tc):
     mode = TARGETS[args.lang][0]
     bcs = []
     if mode in ("c", "cpp", "mixed"):
-        # A custom --build-cmd (e.g. a CMake invocation) runs under a shell so
-        # it can be a compound command; gllvm wrappers are injected via env.
-        build_cmd = ["sh", "-c", args.build_cmd] if args.build_cmd else None
+        # An explicit --build-cmd wins; otherwise auto-detect the build system
+        # from the project's files. Either runs under a shell so it can be a
+        # compound command; gllvm wrappers are injected via env.
+        build = args.build_cmd or acquire_c.detect_build_cmd(args.project)
+        if not args.build_cmd:
+            print(f"build command: {build or 'make'}"
+                  f"{'' if build else ' (default; no build system detected)'}")
+        build_cmd = ["sh", "-c", build] if build else None
         bcs.append(
             acquire_c.acquire_c_bitcode(args.project, tc, args.artifact, build_cmd)
         )
@@ -105,7 +112,9 @@ def build_parser():
     r.add_argument("--artifact", default="main.o",
                    help="built object/binary to extract C/C++ bitcode from")
     r.add_argument("--build-cmd", default=None, dest="build_cmd",
-                   help="shell build command for C/C++ (default: make); "
+                   help="shell build command for C/C++ (default: auto-detected "
+                        "from configure/Makefile/CMakeLists.txt/build.ninja/"
+                        "meson.build, else make); "
                         "e.g. 'cmake -S . -B build && cmake --build build'")
     r.add_argument("--entry", action="append", default=None,
                    help="entry function (repeatable; overrides the --lang default). "
