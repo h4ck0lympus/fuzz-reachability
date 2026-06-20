@@ -21,3 +21,4 @@ reached.txt
 test.json
 *~
 **/*~
+.cache
