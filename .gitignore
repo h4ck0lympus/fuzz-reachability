@@ -15,4 +15,9 @@ fixtures/**/merged.bc
 .venv/
 third_party/
 compile_commands.json
-.claude/
+analyzer/test/entry_resolve.ll
+not_reached.txt
+reached.txt
+test.json
+*~
+**/*~
