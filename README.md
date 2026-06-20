@@ -10,16 +10,16 @@ can be reached*, not which ones ran. No function that is actually reachable is
 ever reported unreachable. Over-reporting is expected and safe; under-reporting
 is a bug.
 
-Feed the output to clang's SanitizerCoverage allow/ignore lists to instrument
+Feed the output to AFL++ or clang's SanitizerCoverage allow/ignore lists to instrument
 only reachable code — cheaper, more focused fuzzing:
 - **AFL++**: `export AFL_LLVM_ALLOWLIST=$(pwd)/reached.txt` -or- `export AFL_LLVM_DENYLIST=$(pwd)/not_reached.txt`
 - **sancov based fuzzers** (libfuzzer, honggfuzz, libafl, AFL++): `-fsanitize-coverage-allowlist=$(pwd)/reached.txt` -or- `-fsanitize-coverage-ignorelist=$(pwd)/not_reached.txt`
 
 
 **Deep dives:**
-- Worked examples, step by step — a libFuzzer harness (libxml2), a ziggy harness (the `url` crate), and a cargo-afl harness (rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
+- Worked examples, step by step — a generic `LLVMFuzzerTestOneInput` harness for AFL++/libfuzzer (libxml2), a ziggy harness (the `url` crate), and a cargo-afl harness (rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
 - LLVM version support and the SVF fallback plan — [`docs/llvm-support.md`](docs/llvm-support.md)
-- ziggy harnesses (Rust `main` entry) — [`docs/ziggy.md`](docs/ziggy.md)
+
 
 Author: Marc "vanHauser" Heuse
 
@@ -192,9 +192,6 @@ acquires the bitcode and roots at `main` automatically:
 reachability run --lang ziggy --project <harness> --out z.json
 ```
 
-For project-specific caveats (custom rustflags, workspace target dirs), see
-[`docs/ziggy.md`](docs/ziggy.md).
-
 > For complete, start-to-finish walkthroughs on real targets — ziggy (the `url`
 > crate), cargo-afl (rustyknife), and libFuzzer (libxml2) harnesses — see
 > [`docs/EXAMPLES.md`](docs/EXAMPLES.md).
@@ -244,7 +241,7 @@ entry point(s).
 | `afl` | cargo (Rust) | `main` |
 
 The C/C++ targets root at both `main` and `LLVMFuzzerTestOneInput`, so one
-`--lang c`/`cpp` covers a normal program and a libFuzzer harness alike. A default
+`--lang c`/`cpp` covers a normal program and an LLVMFUzzerTestOneInput harness alike. A default
 entry that matches nothing is a harmless warning, because roots are unioned.
 
 #### Entry resolution
