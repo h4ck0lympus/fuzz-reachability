@@ -87,3 +87,49 @@ def test_find_artifacts_detects_archive(tmp_path):
     _write(str(tmp_path / "lib.a"), b"!<arch>\n" + b"junk.llvm_bc more")
     found = acquire_c.find_artifacts(str(tmp_path))
     assert [os.path.basename(p) for p in found] == ["lib.a"]
+
+
+def test_member_name_strips_gllvm_naming():
+    # gllvm names the per-object bitcode '.<obj>.bc' next to the object.
+    assert acquire_c._member_name("/p/libtiff/.tif_aux.o.bc") == "tif_aux.o"
+    assert acquire_c._member_name("/p/tools/.thumbnail.o.bc") == "thumbnail.o"
+    assert acquire_c._member_name("plain.o.bc") == "plain.o"
+
+
+def test_bitcode_archives_only_marked(tmp_path):
+    _write(str(tmp_path / "withbc.a"), b"!<arch>\n" + b"x.llvm_bc y")
+    _write(str(tmp_path / "nobc.a"), b"!<arch>\n" + b"nothing here")
+    _write(str(tmp_path / "exec"), _fake_elf(2), executable=True)
+    found = acquire_c._bitcode_archives(str(tmp_path))
+    assert [os.path.basename(p) for p in found] == ["withbc.a"]
+
+
+def test_plan_static_libs_auto_picks_linked_archive():
+    manifest = ["/p/tools/.thumbnail.o.bc", "/p/lt/.tif_aux.o.bc"]
+    members = {
+        "/p/lt/libtiff.a": {"tif_aux.o", "tif_getimage.o"},
+        "/p/x/libother.a": {"other.o"},
+    }
+    chosen, roots = acquire_c._plan_static_libs(manifest, members, "auto")
+    # libtiff is linked (tif_aux is in the manifest); libother is not.
+    assert chosen == ["/p/lt/libtiff.a"]
+    # only the target's own object is a root; the archive member is not.
+    assert roots == ["/p/tools/.thumbnail.o.bc"]
+
+
+def test_plan_static_libs_all_includes_everything():
+    manifest = ["/p/tools/.thumbnail.o.bc", "/p/lt/.tif_aux.o.bc"]
+    members = {
+        "/p/lt/libtiff.a": {"tif_aux.o", "tif_getimage.o"},
+        "/p/x/libother.a": {"other.o"},
+    }
+    chosen, roots = acquire_c._plan_static_libs(manifest, members, "all")
+    assert set(chosen) == {"/p/lt/libtiff.a", "/p/x/libother.a"}
+    assert roots == ["/p/tools/.thumbnail.o.bc"]
+
+
+def test_plan_static_libs_auto_no_manifest_picks_nothing():
+    members = {"/p/lt/libtiff.a": {"tif_aux.o"}}
+    chosen, roots = acquire_c._plan_static_libs([], members, "auto")
+    assert chosen == []
+    assert roots == []

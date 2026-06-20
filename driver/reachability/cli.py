@@ -52,8 +52,11 @@ def _acquire(args, tc):
             print(f"build command: {build or 'make'}"
                   f"{'' if build else ' (default; no build system detected)'}")
         build_cmd = ["sh", "-c", build] if build else None
-        bcs.append(
-            acquire_c.acquire_c_bitcode(args.project, tc, args.artifact, build_cmd)
+        bcs.extend(
+            acquire_c.acquire_c_bitcode(
+                args.project, tc, args.artifact, build_cmd,
+                static_libs=args.static_libs,
+            )
         )
     if mode in ("rust", "mixed"):
         bcs.extend(
@@ -118,6 +121,14 @@ def build_parser():
                         "from configure/Makefile/CMakeLists.txt/build.ninja/"
                         "meson.build, else make); "
                         "e.g. 'cmake -S . -B build && cmake --build build'")
+    r.add_argument("--static-libs", default="auto",
+                   choices=["auto", "none", "all"],
+                   help="C/C++: how to treat static archives (.a) the target "
+                        "links. 'auto' (default) also analyzes the full contents "
+                        "of each linked archive (so members the linker discarded "
+                        "are reported, not silently dropped); 'none' keeps only "
+                        "the linker's view; 'all' includes every bitcode archive "
+                        "in the tree")
     r.add_argument("--entry", action="append", default=None,
                    help="entry function (repeatable; overrides the --lang default). "
                         "Accepts a mangled symbol, a demangled name, a '::name' "

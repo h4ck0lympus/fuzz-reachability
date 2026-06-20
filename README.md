@@ -1,90 +1,100 @@
-# Static Fuzz-Reachability Analyzer (C / C++ / Rust, LLVM IR level)
+# Static Fuzz-Reachability Analyzer (C / C++ / Rust)
 
-Given a project's build, compute the set of functions **statically reachable**
-from a fuzz entry point (`LLVMFuzzerTestOneInput`, or a Rust cargo-fuzz entry).
-The result is a sound-leaning **over-approximation** — "which functions *can* be
-reached" — not dynamic coverage. It works uniformly for C, C++, and Rust
-(including mixed-language projects) by analyzing merged LLVM bitcode.
+Given a project's build, this tool computes the set of functions a fuzz entry
+point (`LLVMFuzzerTestOneInput`, a Rust cargo-fuzz target, or any entry you name)
+can **statically reach**. It works uniformly across C, C++, and Rust — including
+mixed-language projects — by analyzing merged LLVM bitcode.
 
-**Soundness invariant:** no function that is actually reachable is ever reported
-unreachable. Over-approximation is expected; under-approximation is a bug.
+The result is a **sound-leaning over-approximation**: it answers *which functions
+can be reached*, not which ones ran. No function that is actually reachable is
+ever reported unreachable. Over-reporting is expected and safe; under-reporting
+is a bug.
 
-- **LLVM version support + SVF fallback plan:** [`docs/llvm-support.md`](docs/llvm-support.md)
-- **ziggy fuzz harness (Rust `main` entry):** [`docs/ziggy.md`](docs/ziggy.md)
+Feed the output to clang's SanitizerCoverage allow/ignore lists to instrument
+only reachable code — cheaper, more focused fuzzing.
 
-Author: Marc "vanHauser" Heuse
+**Deep dives:**
+- Worked examples, step by step — a libFuzzer harness (libxml2), a ziggy harness (the `url` crate), and a cargo-afl harness (rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
+- LLVM version support and the SVF fallback plan — [`docs/llvm-support.md`](docs/llvm-support.md)
+- ziggy harnesses (Rust `main` entry) — [`docs/ziggy.md`](docs/ziggy.md)
 
-License: GNU Affero General Public License 3 or newer
+Author: Marc "vanHauser" Heuse · License: GNU AGPL v3 or newer
 
 ## How it works
 
 ```
- driver (Python)            analyzer (C++ / LLVM)
- ───────────────            ─────────────────────
+ driver (Python)              analyzer (C++ / LLVM)
+ ───────────────              ─────────────────────
    acquire bitcode ─┐
-   C/C++ : gllvm    │   llvm-link     load .bc → call graph → indirect resolve
-   Rust  : rustc    ├─► merge .bc ─►  (type-based | SVF) → BFS from entry →
-   --emit=llvm-bc  ─┘                 JSON report (+ optional DOT)
+   C/C++ : gllvm    │  llvm-link    load .bc → build call graph →
+   Rust  : rustc    ├─► merge .bc ─► resolve indirect calls → BFS from
+   --emit=llvm-bc  ─┘               entry → JSON report + sancov lists
 ```
 
-- **Analyzer** — a standalone C++ tool linking LLVM. Loads merged `.bc`, builds
-  the call graph, resolves indirect calls (C function pointers, C++ virtual
-  dispatch, Rust `dyn`/`fn` pointers), runs reachability, emits JSON. Demangles
-  Itanium (C++) and Rust legacy/v0 names.
-- **Driver** — a Python orchestrator that acquires bitcode per language, merges
-  it, checks toolchain version coherence, and runs the analyzer.
+Two components, joined by merged bitcode:
+
+- **Driver** (Python) — acquires bitcode per language, merges it with
+  `llvm-link`, verifies the LLVM toolchain is version-coherent, and runs the
+  analyzer.
+- **Analyzer** (C++ linking LLVM) — loads the merged `.bc`, builds the call
+  graph, resolves indirect calls (C function pointers, C++ virtual dispatch, Rust
+  `dyn`/`fn` pointers), computes reachability from the entry, and emits a JSON
+  report plus the two sancov lists. It demangles C++ (Itanium) and Rust names.
 
 ## Prerequisites
 
-- **LLVM ≥ 21** (21 is the floor; 22, 23, … work for the core analyzer). A
-  coherent toolchain: `clang`, `clang++`, `llvm-link`, `opt`, and the analyzer
-  all on one major **M ≥ 21**, with rustc's LLVM ≤ M. See
-  [`docs/llvm-support.md`](docs/llvm-support.md).
-- **Go** (to install `gllvm`), **Python ≥ 3.12**, **rustc/cargo** (nightly for
-  Rust targets), a C++17 compiler.
+- **LLVM ≥ 21.** One coherent toolchain: `clang`, `clang++`, `llvm-link`, `opt`,
+  and the analyzer all share one major **M ≥ 21**, and rustc's LLVM is no newer
+  than M. See [`docs/llvm-support.md`](docs/llvm-support.md).
+- **Go** (to install `gllvm`), **Python ≥ 3.12**, and a **C++17** compiler. Rust
+  targets also need **rustc / cargo** (nightly).
 
-## Build
+## Install
 
-The analyzer builds with a plain Makefile driven by `llvm-config`.
+The analyzer builds with a plain Makefile driven by `llvm-config` — no CMake.
 
 ```bash
-bash scripts/setup.sh          # installs gllvm + rust-src, creates .venv, builds the analyzer
-# or, piecemeal:
-make venv                      # create .venv with the driver + pytest (scripts/setup_venv.sh)
-make build                     # build analyzer on LLVM 21  -> analyzer/build/reachability-analyzer
-make build LLVM_MAJOR=23       # build against LLVM 23 instead
-make test                      # run the full test suite (auto-creates .venv if missing)
-make matrix                    # build + test against every installed LLVM (21/22/23/…)
+bash scripts/setup.sh        # gllvm + rust-src, create .venv, build the analyzer
 ```
 
-The Python driver lives in a virtualenv at `.venv` (created by
-`make venv` / `scripts/setup_venv.sh`, which installs `driver/` editable plus
-its test deps). To use the `reachability` CLI directly, point it at the built
-analyzer and put `gllvm` on `PATH`:
+Or piecemeal:
+
+```bash
+make venv                    # create .venv (driver, editable + pytest)
+make build                   # build the analyzer on the auto-selected LLVM (≥ 21)
+make build LLVM_MAJOR=23     # ...or pin a specific major
+make test                    # run the full test suite
+make matrix                  # build + test against every installed LLVM ≥ 21
+make help                    # list all targets
+```
+
+To run the CLI, point it at the built analyzer and put `gllvm` on `PATH`:
 
 ```bash
 export REACHABILITY_ANALYZER=$PWD/analyzer/build/reachability-analyzer
 export PATH="$(go env GOPATH)/bin:$PATH"     # gclang / gclang++ / get-bc
 source .venv/bin/activate                    # or call .venv/bin/reachability directly
-reachability check-toolchain                 # verifies LLVM version coherence
+reachability check-toolchain                 # verify LLVM version coherence first
 ```
 
-`make help` lists all targets.
+## Quick start
 
-## Running it
+```bash
+reachability run --lang <target> --project <dir> --out <file>
+```
 
-The driver subcommand is `reachability run --lang TARGET --project DIR --out FILE`,
-where `TARGET` is a source language (`c`/`cpp`/`rust`/`mixed`) or a Rust fuzz
-harness (`libfuzzer`/`ziggy`/`afl`). Each target sets a default entry point, so
-the common case needs no `--entry` at all. Full flag reference:
-[Command-line reference](#command-line-reference).
+`<target>` is a source language (`c`, `cpp`, `rust`, `mixed`) or a Rust fuzz
+harness (`libfuzzer`, `ziggy`, `afl`). Each sets a default entry point, so the
+common case needs no `--entry`. The build command and the artifact are
+auto-detected for C/C++; override them with `--build-cmd` / `--artifact` when
+needed. Full options: [Command-line reference](#command-line-reference).
 
-### 1. A simple C target
+## Examples
 
-`fixtures/c_direct` is a tiny C fuzz target (its `Makefile` compiles `main.c` to
-an object; a fuzz target has no `main()`, so `get-bc` extracts the object's
-bitcode). The build command and the artifact are auto-detected, so neither
-`--build-cmd` nor `--artifact` is needed:
+### A C target
+
+`fixtures/c_direct` is a small C fuzz target. Its build and artifact are
+auto-detected:
 
 ```bash
 reachability run --lang c --project fixtures/c_direct --out c.json -v
@@ -94,72 +104,93 @@ reachability run --lang c --project fixtures/c_direct --out c.json -v
 reachable 3 / defined 4  (0 indirect-only, 1 unreachable)  [backend=type-based]
 ```
 
-`LLVMFuzzerTestOneInput → used_a → used_b` are reachable; `dead_fn` is reported
-in `unreachable_defined`.
+`LLVMFuzzerTestOneInput → used_a → used_b` are reachable; `dead_fn` lands in
+`unreachable_defined`.
 
-### 2. A CMake C++ target
+### A C++ target (CMake)
 
-`examples/cpp_cmake` is a C++ fuzz target built with CMake and using virtual
-dispatch. The driver auto-detects the CMake build (from `CMakeLists.txt`), wraps
-it with `gllvm` (injecting `CC=gclang`, `CXX=gclang++`), and `get-bc` extracts
-whole-program bitcode from the auto-detected executable:
+`examples/cpp_cmake` uses virtual dispatch. The driver detects the CMake build,
+wraps it with `gllvm`, and analyzes the resulting executable:
 
 ```bash
 reachability run --lang cpp --project examples/cpp_cmake --out cpp.json -v
 ```
 
-Override either step explicitly when needed, e.g.
-`--build-cmd "cmake -S . -B build && cmake --build build" --artifact build/fuzz_target`.
-
-The virtual call `Codec::decode` resolves (over-approximated) to **both**
-overrides, flagged as reached via indirect edges:
+The virtual call `Codec::decode` over-approximates to **both** overrides, reached
+via indirect edges:
 
 ```
   Raw::decode(unsigned char const*, unsigned long) | via indirect
   Xor::decode(unsigned char const*, unsigned long) | via indirect
 ```
 
-### 3. A Rust target
+### A Rust target
 
-`fixtures/rust_dyn` is a Rust `staticlib` with a `#[no_mangle]`
-`LLVMFuzzerTestOneInput` that dispatches through a `dyn Trait`. The driver builds
-it with `RUSTFLAGS="--emit=llvm-bc …"` and collects the per-crate bitcode:
+`fixtures/rust_dyn` is a Rust `staticlib` whose `LLVMFuzzerTestOneInput`
+dispatches through a `dyn Trait`. The driver builds it with
+`RUSTFLAGS="--emit=llvm-bc …"` and collects the per-crate bitcode:
 
 ```bash
 reachability run --lang rust --project fixtures/rust_dyn --out rust.json -v
 ```
 
-The trait-object call resolves to both impls (v0-demangled), via indirect edges:
+The trait-object call resolves to both implementations, via indirect edges:
 
 ```
   <rust_dyn::Inc as rust_dyn::Op>::run | via indirect
   <rust_dyn::Dbl as rust_dyn::Op>::run | via indirect
 ```
 
-> **Mixed C+Rust (cargo-fuzz shape):** `fixtures/mixed_c_rust` shows a C++
-> `LLVMFuzzerTestOneInput` glue calling an `extern "C"` Rust entry. Use
-> `--lang mixed`; the cross-language edge resolves by C ABI symbol name once both
-> sides' bitcode is merged.
+### A mixed C + Rust target (cargo-fuzz shape)
 
-### 4. A ziggy harness (Rust `main` entry)
-
-A [ziggy](https://github.com/srlabs/ziggy) harness is a Rust **bin** crate whose
-fuzz loop lives in `ziggy::fuzz!(|data| { … })` inside `fn main()` — so the entry
-is the **Rust `main`**, not `LLVMFuzzerTestOneInput`. Root the analysis at the
-*mangled* Rust `main` (the bare `main` is a C-ABI shim that dead-ends in
-precompiled `std`):
+`fixtures/mixed_c_rust` has C++ glue calling an `extern "C"` Rust entry. Use
+`--lang mixed`; the driver builds and merges both sides' bitcode (gllvm for the
+glue, cargo for Rust), and the cross-language edge resolves by C-ABI symbol name:
 
 ```bash
-cd <harness>
-RUSTFLAGS="--emit=llvm-bc -Cembed-bitcode=yes -Ccodegen-units=1" cargo build
-llvm-link-22 target/debug/deps/*.bc -o merged.bc
-main=$(llvm-nm-22 --defined-only target/debug/deps/<bin>-*.bc | grep ' T ' | grep main)  # pick <crate>::main
-reachability-analyzer merged.bc --entry "$main" --out reach.json \
-  --reached-out reached.txt --not-reached-out not_reached.txt
+reachability run --lang mixed --project fixtures/mixed_c_rust \
+  --artifact glue.o --out mixed.json -v
 ```
 
-Full walkthrough, gotchas (custom `rustflags`, workspace target dirs, finding the
-symbol), and a worked move-smith example: [`docs/ziggy.md`](docs/ziggy.md).
+Point `--artifact` at the C/C++ object so it is picked out from the Rust build
+outputs.
+
+### A target that links a static library
+
+A tool linked against a static library (say `tools/thumbnail` linking
+`libtiff.a`) embeds only the archive members the linker actually pulled in. To
+analyze the **whole library** — not just the slice the linker kept — point
+`--artifact` at the linked binary and keep the default `--static-libs auto`:
+
+```bash
+reachability run --lang c --project tiff-4.0.4 --artifact tools/thumbnail \
+  --out tiff.json -v
+```
+
+The driver merges `thumbnail`'s own objects with the full contents of
+`libtiff.a`. Functions in members the linker discarded (e.g. `TIFFReadRGBAImage`,
+`TIFFPrintDirectory`) now show up as unreachable instead of vanishing, while the
+reachable set is unchanged from the linker's view — adding the rest of the
+library can only add *unreachable* functions, never remove reachable ones. Use
+`--static-libs none` for the linker's view only, or `all` to include every
+bitcode archive in the tree.
+
+### A ziggy harness
+
+A [ziggy](https://github.com/srlabs/ziggy) harness is a Rust binary whose fuzz
+loop lives in `main` rather than in `LLVMFuzzerTestOneInput`. `--lang ziggy`
+acquires the bitcode and roots at `main` automatically:
+
+```bash
+reachability run --lang ziggy --project <harness> --out z.json
+```
+
+For project-specific caveats (custom rustflags, workspace target dirs), see
+[`docs/ziggy.md`](docs/ziggy.md).
+
+> For complete, start-to-finish walkthroughs on real targets — ziggy (the `url`
+> crate), cargo-afl (rustyknife), and libFuzzer (libxml2) harnesses — see
+> [`docs/EXAMPLES.md`](docs/EXAMPLES.md).
 
 ## Command-line reference
 
@@ -168,32 +199,32 @@ The `reachability` CLI has two subcommands.
 ### `reachability check-toolchain`
 
 Resolves and validates the LLVM toolchain (analyzer, `clang`/`clang++`,
-`llvm-link`, `opt`, rustc) for version coherence and prints what it found. Takes
-no options. Exits non-zero on any incoherence. Run it first. See
-[`docs/llvm-support.md`](docs/llvm-support.md) for the version policy.
+`llvm-link`, `opt`, rustc) for version coherence and prints what it found. Run it
+first; it exits non-zero on any incoherence. See
+[`docs/llvm-support.md`](docs/llvm-support.md) for the policy.
 
 ### `reachability run`
 
-Build a project, merge its bitcode, and compute the reachable set from the entry
-point(s).
+Builds a project, merges its bitcode, and computes the reachable set from the
+entry point(s).
 
 | Option | Default | Meaning |
 |--------|---------|---------|
 | `--project DIR` | *(required)* | Project directory to build and analyze. |
-| `--lang TARGET` | *(required)* | Target type — see the table below. Selects how bitcode is acquired and the default entry. |
-| `--out FILE` | *(required)* | Path for the JSON report. The two sancov lists default to `reached.txt` / `not_reached.txt` next to it. |
-| `--entry NAME` | per `--lang` | Entry function to root reachability at. **Repeatable.** Overrides the target default. Accepts a mangled symbol, a demangled name, a `::name` suffix (e.g. `main`), or the alias `fuzz_target!` — no mangled name required. |
+| `--lang TARGET` | *(required)* | Target type (see the table below): sets how bitcode is acquired and the default entry. |
+| `--out FILE` | *(required)* | Path for the JSON report. The two sancov lists default to `reached.txt` / `not_reached.txt` beside it. |
+| `--entry NAME` | per `--lang` | Entry to root reachability at. **Repeatable**; overrides the target default. See [Entry resolution](#entry-resolution). |
 | `--backend {type-based,svf}` | `type-based` | Indirect-call resolution backend. `svf` needs an SVF-enabled analyzer (`make build-svf`). |
-| `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive `get-bc` extracts whole-program bitcode from (relative to `--project`). If omitted, the build product is auto-detected by scanning the tree for the file carrying gllvm's embedded bitcode, preferring an executable over a shared lib, archive, then object. |
-| `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with gllvm wrappers injected. E.g. `"cmake -S . -B build && cmake --build build"`. If omitted, the build system is auto-detected from the project files (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, with an autotools-bootstrap fallback), defaulting to `make`. |
-| `--build-std` | off | Rust only: build the standard library from source too (`-Zbuild-std`), so std functions appear in the graph instead of as external declarations. |
+| `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive to extract bitcode from (relative to `--project`). Auto-detected otherwise, preferring an executable over a shared library, archive, then object. |
+| `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with `gllvm` injected. E.g. `"cmake -S . -B build && cmake --build build"`. Auto-detected from the project files otherwise (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, else `make`). |
+| `--static-libs {auto,none,all}` | `auto` | C/C++ only: how to treat static archives (`.a`) the target links. `auto` also analyzes each linked archive in full, so members the linker dropped are reported rather than silently absent. `none` keeps only the linker's view. `all` includes every bitcode archive in the tree (best-effort; can fail to link if two archives define the same symbol). |
+| `--build-std` | off | Rust only: build the standard library from source (`-Zbuild-std`) so std functions appear in the graph instead of as external declarations. |
 | `--dot FILE` | *(none)* | Also write the reachable subgraph as Graphviz DOT (indirect edges dashed/red). |
-| `--reached FILE` | `reached.txt` next to `--out` | Path for the sancov **allowlist** of reachable functions. |
-| `--not-reached FILE` | `not_reached.txt` next to `--out` | Path for the sancov **ignorelist** of unreachable functions. |
+| `--reached FILE` | beside `--out` | Path for the sancov **allowlist** of reachable functions. |
+| `--not-reached FILE` | beside `--out` | Path for the sancov **ignorelist** of unreachable functions. |
 | `-v`, `--verbose` | off | Print a per-function breakdown in the summary. |
 
-**Target types (`--lang`)** — each maps to a bitcode-acquisition method and a
-default entry:
+#### Target types (`--lang`)
 
 | `--lang` | acquires via | default entry |
 |----------|--------------|---------------|
@@ -201,51 +232,52 @@ default entry:
 | `cpp` | gllvm (`gclang++`) | `main` + `LLVMFuzzerTestOneInput` |
 | `rust` | `cargo` + `--emit=llvm-bc` | `main` |
 | `mixed` | gllvm **and** cargo (merged) | `LLVMFuzzerTestOneInput` |
-| `libfuzzer` | cargo (Rust) | `fuzz_target!` (→ `LLVMFuzzerTestOneInput` + `rust_fuzzer_test_input`) |
+| `libfuzzer` | cargo (Rust) | `fuzz_target!` |
 | `ziggy` | cargo (Rust) | `main` |
 | `afl` | cargo (Rust) | `main` |
 
-The C/C++ targets root at both `main` and `LLVMFuzzerTestOneInput`, so the same
-`--lang c`/`cpp` covers a normal program and a libFuzzer harness without an
-`--entry`; a default that matches nothing in the module is a harmless warning
-(roots are unioned). The harness targets (`libfuzzer`/`ziggy`/`afl`) are the Rust
-shapes.
+The C/C++ targets root at both `main` and `LLVMFuzzerTestOneInput`, so one
+`--lang c`/`cpp` covers a normal program and a libFuzzer harness alike. A default
+entry that matches nothing is a harmless warning, because roots are unioned.
 
-**Entry resolution.** `--entry` never requires a mangled symbol. A token matches,
-unioned across all of: an exact mangled symbol; an exact demangled name; a
-demangled `::token` suffix (so `main` finds `crate::main`, and the Rust legacy
-`::h<hash>` disambiguator is ignored); and the alias `fuzz_target!`. Matching more
-than one function just adds roots — always sound (over-approximating). For a Rust
-binary, root at `main` (resolves the real Rust `main`), not the bare C-ABI `main`
-shim which dead-ends in precompiled `std`.
+#### Entry resolution
 
-**Environment variables.**
+`--entry` never requires a mangled symbol. A token matches — unioned across all
+of:
+
+- an exact mangled symbol (e.g. `_Z3foov`),
+- an exact demangled name (e.g. `foo()`),
+- a demangled `::name` suffix (so `main` finds `crate::main`), and
+- the alias `fuzz_target!` (→ `LLVMFuzzerTestOneInput` + `rust_fuzzer_test_input`).
+
+Matching more than one function only adds roots, which stays sound. For a Rust
+binary, just root at `main`: the token matches the real Rust `main`, so you never
+need to type a mangled symbol.
+
+#### Environment variables
 
 | Variable | Purpose |
 |----------|---------|
 | `REACHABILITY_ANALYZER` | Path to the analyzer binary (default `analyzer/build/reachability-analyzer`). |
-| `REACHABILITY_ANALYZER_SVF` | Path to an SVF-enabled analyzer (used by `--backend=svf`/tests). |
+| `REACHABILITY_ANALYZER_SVF` | Path to an SVF-enabled analyzer (for `--backend=svf` and tests). |
 | `CLANG` / `CLANGXX` / `LLVM_LINK` / `OPT` | Override individual tool paths (otherwise resolved by major from the analyzer's LLVM). |
-| `PATH` | Must contain `gclang`/`gclang++`/`get-bc` (gllvm) for C/C++/mixed targets. |
+| `PATH` | Must contain `gclang` / `gclang++` / `get-bc` (gllvm) for C/C++/mixed targets. |
 
 ## Output
 
-`reachability run` writes three files (the analyzer flags are
-`--out` / `--reached-out` / `--not-reached-out`):
+`reachability run` writes three files:
 
-- **`<out>.json`** — `summary` counts, a `reachable` array (mangled + demangled
+- **`<out>.json`** — `summary` counts, a `reachable` array (mangled and demangled
   name, source file/line when debug info is present, `via` =
-  `direct`/`indirect`/`both`, and an `indirect_only` audit flag), and an
-  `unreachable_defined` array. `--dot FILE` additionally writes the reachable
-  subgraph (indirect edges dashed/red).
-- **`reached.txt`** — a SanitizerCoverage **allowlist** of the statically
-  reachable functions, one `fun:<mangled>` per line.
-- **`not_reached.txt`** — a SanitizerCoverage **ignorelist** of the unreachable
-  functions, one `fun:<mangled>` per line.
+  `direct`/`indirect`/`both`, and an `indirect_only` flag), and an
+  `unreachable_defined` array. With `--dot FILE`, also the reachable subgraph.
+- **`reached.txt`** — a SanitizerCoverage **allowlist** of reachable functions.
+- **`not_reached.txt`** — a SanitizerCoverage **ignorelist** of unreachable
+  functions.
 
-Both lists use the function's **mangled** (LLVM symbol) name — what clang matches
-`fun:` against — so they work for C, C++ (Itanium), and Rust (v0). Feed them to
-clang to instrument only reachable code (cheaper, more focused fuzzing):
+Both lists use each function's **mangled** (LLVM symbol) name — what clang
+matches `fun:` against — so they cover C, C++, and Rust. Feed either to clang to
+instrument only reachable code:
 
 ```bash
 # instrument ONLY reachable functions:
@@ -254,28 +286,25 @@ clang -fsanitize-coverage=trace-pc-guard -fsanitize-coverage-allowlist=reached.t
 clang -fsanitize-coverage=trace-pc-guard -fsanitize-coverage-ignorelist=not_reached.txt ...
 ```
 
-> A coverage **allowlist** instruments a function only when both a `src:` and a
-> `fun:` entry match, so `reached.txt` begins with a `src:*` line. An
-> **ignorelist** has no such requirement, so `not_reached.txt` is pure `fun:`
-> lines. (Verified against clang in `driver/tests/test_covlists.py`.)
+> A coverage allowlist instruments a function only when both a `src:` and a
+> `fun:` entry match, so `reached.txt` opens with a `src:*` line. An ignorelist
+> has no such requirement, so `not_reached.txt` is pure `fun:` lines. (Verified
+> against clang in `driver/tests/test_covlists.py`.)
 
 ## Indirect-call backends
 
 | Backend | Flag | Notes |
 |---------|------|-------|
-| Type-based (default) | `--backend=type-based` | Address-taken functions bucketed by LLVM function type. Language-agnostic, always available, sound. |
-| SVF Andersen points-to | `--backend=svf` | Higher precision. Optional; built separately. Falls back to type-based for callsites it cannot resolve. |
+| Type-based (default) | `--backend=type-based` | Buckets address-taken functions by LLVM function type. Language-agnostic, always available, sound. |
+| SVF Andersen points-to | `--backend=svf` | Higher precision. Optional; built separately. Falls back to type-based for any callsite it cannot resolve. |
 
-SVF currently builds against **LLVM 21 only** (upstream targets 21.1.x). On
-LLVM 22/23 the core type-based backend is fully functional and `--backend=svf`
-returns a clear error rather than degrading silently. Build it with:
+SVF currently builds against **LLVM 21 only**. On LLVM 22/23 the default
+type-based backend is fully functional, and `--backend=svf` returns a clear error
+rather than degrading silently. Build SVF with:
 
 ```bash
-make build-svf                  # builds the SVF dependency + an SVF-enabled analyzer
+make build-svf      # builds the SVF dependency + an SVF-enabled analyzer (pins LLVM 21)
 ```
-
-`make build-svf` pins LLVM 21 (the only version SVF builds against) regardless of
-the auto-selected core default; pass `LLVM_MAJOR=<n>` to force a different one.
 
 See [`docs/llvm-support.md`](docs/llvm-support.md) for the compatibility matrix
 and the full fallback plan.
@@ -284,25 +313,25 @@ and the full fallback plan.
 
 ```bash
 make test       # full pytest suite (analyzer .ll goldens + per-language soundness)
-make matrix     # LLVM version-compatibility matrix (detects future-LLVM breakage)
+make matrix     # LLVM version-compatibility matrix (catches future-LLVM breakage)
 ```
 
-Fixtures in `fixtures/` carry a `must_reach` / `must_not_reach` set; every
+Each fixture in `fixtures/` carries a `must_reach` / `must_not_reach` set; every
 backend must satisfy the soundness invariant on each.
 
 ## Project layout
 
 ```
-analyzer/       C++ analyzer + Makefile (src/, build via llvm-config)
-driver/         Python driver (reachability/: toolchain, acquire_*, link, analyze, cli)
-fixtures/       per-language test targets with expected reachable sets
-examples/       worked examples (cpp_cmake/)
-scripts/        setup.sh, build_svf.sh, test_matrix.sh
-docs/           LLVM support + SVF fallback, SVF build notes
+analyzer/   C++ analyzer + Makefile (src/, built via llvm-config)
+driver/     Python driver (toolchain, acquire_*, link, analyze, cli)
+fixtures/   per-language test targets with expected reachable sets
+examples/   worked examples (cpp_cmake/)
+scripts/    setup.sh, build_svf.sh, test_matrix.sh, select_llvm.sh
+docs/        worked examples (EXAMPLES.md), LLVM support, SVF notes, ziggy guide
 ```
 
-## Non-goals
+## Limitations
 
-Static over-approximation, not dynamic coverage. Soundness is bounded by
-indirect-call precision and by missing bitcode (precompiled libraries, Rust std
-without `--build-std`).
+This is a static over-approximation, not dynamic coverage. Its precision is
+bounded by indirect-call resolution and by any missing bitcode — precompiled
+libraries, or the Rust standard library without `--build-std`.

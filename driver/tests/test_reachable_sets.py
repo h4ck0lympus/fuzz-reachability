@@ -58,8 +58,8 @@ def test_c_cpp_reachable(analyzer, tmp_path, fixture):
     work = tmp_path / fixture
     shutil.copytree(os.path.join(FIXTURES, fixture), work)
     tc = _tc(analyzer)
-    bc = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
-    merged = link.link_bitcode([bc], str(work / "merged.bc"), tc)
+    bcs = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
+    merged = link.link_bitcode(bcs, str(work / "merged.bc"), tc)
     result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"])
     assert_soundness(result, _expected(fixture))
 
@@ -79,8 +79,8 @@ def test_c_fnptr_breakdown(analyzer, tmp_path):
     work = tmp_path / "c_fnptr"
     shutil.copytree(os.path.join(FIXTURES, "c_fnptr"), work)
     tc = _tc(analyzer)
-    bc = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
-    merged = link.link_bitcode([bc], str(work / "merged.bc"), tc)
+    bcs = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
+    merged = link.link_bitcode(bcs, str(work / "merged.bc"), tc)
     result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"])
     # The fn-pointer handlers are reachable only via the indirect call.
     assert result["summary"]["indirect_only"] >= 1
@@ -104,9 +104,9 @@ def test_mixed_c_rust_reachable(analyzer, tmp_path):
     shutil.copytree(os.path.join(FIXTURES, "mixed_c_rust"), work)
     tc = _tc(analyzer)
     _require_rust_readable(tc)
-    glue_bc = acquire_c.acquire_c_bitcode(str(work), tc, "glue.o")
+    glue_bcs = acquire_c.acquire_c_bitcode(str(work), tc, "glue.o")
     rust_bcs = acquire_rust.acquire_rust_bitcode(str(work))
-    merged = link.link_bitcode([glue_bc, *rust_bcs], str(work / "merged.bc"), tc)
+    merged = link.link_bitcode([*glue_bcs, *rust_bcs], str(work / "merged.bc"), tc)
     result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"])
     assert_soundness(result, _expected("mixed_c_rust"))
 
@@ -138,8 +138,8 @@ def test_svf_c_cpp_sound(svf_analyzer, tmp_path, fixture):
     work = tmp_path / fixture
     shutil.copytree(os.path.join(FIXTURES, fixture), work)
     tc = _tc(svf_analyzer)
-    bc = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
-    merged = link.link_bitcode([bc], str(work / "merged.bc"), tc)
+    bcs = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
+    merged = link.link_bitcode(bcs, str(work / "merged.bc"), tc)
     result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"], backend="svf")
     assert result["backend"] == "svf"
     assert_soundness(result, _expected(fixture))
