@@ -1,4 +1,24 @@
+import os
+import struct
+
 from reachability import acquire_c
+
+
+def _fake_elf(etype, marker=True, executable=False):
+    b = bytearray(64)
+    b[0:4] = b"\x7fELF"
+    b[4] = 2
+    b[5] = 1
+    struct.pack_into("<H", b, 16, etype)
+    data = bytes(b) + (b"\x00.llvm_bc\x00" if marker else b"\x00padpadpad\x00")
+    return data
+
+
+def _write(path, data, executable=False):
+    with open(path, "wb") as fh:
+        fh.write(data)
+    if executable:
+        os.chmod(path, 0o755)
 
 
 def test_build_env_sets_wrappers(monkeypatch):
@@ -41,3 +61,29 @@ def test_detect_build_cmd_configure_precedes_make(tmp_path):
     (tmp_path / "configure").write_text("#!/bin/sh\n")
     (tmp_path / "Makefile").write_text("all:\n\ttrue\n")
     assert acquire_c.detect_build_cmd(str(tmp_path)) == "./configure && make"
+
+
+def test_find_artifacts_prefers_executable_over_object(tmp_path):
+    _write(str(tmp_path / "main.o"), _fake_elf(1))
+    _write(str(tmp_path / "fuzz"), _fake_elf(2), executable=True)
+    found = acquire_c.find_artifacts(str(tmp_path))
+    assert os.path.basename(found[0]) == "fuzz"
+    assert {os.path.basename(p) for p in found} == {"fuzz", "main.o"}
+
+
+def test_find_artifacts_prefers_bitcode_marker(tmp_path):
+    _write(str(tmp_path / "with_bc"), _fake_elf(2, marker=True), executable=True)
+    _write(str(tmp_path / "no_bc"), _fake_elf(2, marker=False), executable=True)
+    assert os.path.basename(acquire_c.find_artifacts(str(tmp_path))[0]) == "with_bc"
+
+
+def test_find_artifacts_ignores_non_binaries(tmp_path):
+    (tmp_path / "main.c").write_text("int main(){return 0;}\n")
+    (tmp_path / "notes.txt").write_text("hello\n")
+    assert acquire_c.find_artifacts(str(tmp_path)) == []
+
+
+def test_find_artifacts_detects_archive(tmp_path):
+    _write(str(tmp_path / "lib.a"), b"!<arch>\n" + b"junk.llvm_bc more")
+    found = acquire_c.find_artifacts(str(tmp_path))
+    assert [os.path.basename(p) for p in found] == ["lib.a"]

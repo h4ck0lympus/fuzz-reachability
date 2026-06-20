@@ -109,8 +109,10 @@ def build_parser():
                    help="target type: source language (c/cpp/rust/mixed) or Rust "
                         "fuzz harness (libfuzzer/ziggy/afl). The harness types set "
                         "the default entry: libfuzzer->fuzz_target!, ziggy/afl->main")
-    r.add_argument("--artifact", default="main.o",
-                   help="built object/binary to extract C/C++ bitcode from")
+    r.add_argument("--artifact", default=None,
+                   help="C/C++: built binary/object/archive to extract bitcode "
+                        "from, relative to --project (default: auto-detect the "
+                        "build product)")
     r.add_argument("--build-cmd", default=None, dest="build_cmd",
                    help="shell build command for C/C++ (default: auto-detected "
                         "from configure/Makefile/CMakeLists.txt/build.ninja/"

@@ -83,10 +83,11 @@ the common case needs no `--entry` at all. Full flag reference:
 
 `fixtures/c_direct` is a tiny C fuzz target (its `Makefile` compiles `main.c` to
 an object; a fuzz target has no `main()`, so `get-bc` extracts the object's
-bitcode):
+bitcode). The build command and the artifact are auto-detected, so neither
+`--build-cmd` nor `--artifact` is needed:
 
 ```bash
-reachability run --lang c --project fixtures/c_direct --artifact main.o --out c.json -v
+reachability run --lang c --project fixtures/c_direct --out c.json -v
 ```
 
 ```
@@ -99,14 +100,16 @@ in `unreachable_defined`.
 ### 2. A CMake C++ target
 
 `examples/cpp_cmake` is a C++ fuzz target built with CMake and using virtual
-dispatch. `gllvm` wraps the CMake build (the driver injects `CC=gclang`,
-`CXX=gclang++`), and `get-bc` extracts whole-program bitcode from the executable:
+dispatch. The driver auto-detects the CMake build (from `CMakeLists.txt`), wraps
+it with `gllvm` (injecting `CC=gclang`, `CXX=gclang++`), and `get-bc` extracts
+whole-program bitcode from the auto-detected executable:
 
 ```bash
-reachability run --lang cpp --project examples/cpp_cmake \
-  --build-cmd "cmake -S . -B build && cmake --build build" \
-  --artifact build/fuzz_target --out cpp.json -v
+reachability run --lang cpp --project examples/cpp_cmake --out cpp.json -v
 ```
+
+Override either step explicitly when needed, e.g.
+`--build-cmd "cmake -S . -B build && cmake --build build" --artifact build/fuzz_target`.
 
 The virtual call `Codec::decode` resolves (over-approximated) to **both**
 overrides, flagged as reached via indirect edges:
@@ -181,7 +184,7 @@ point(s).
 | `--out FILE` | *(required)* | Path for the JSON report. The two sancov lists default to `reached.txt` / `not_reached.txt` next to it. |
 | `--entry NAME` | per `--lang` | Entry function to root reachability at. **Repeatable.** Overrides the target default. Accepts a mangled symbol, a demangled name, a `::name` suffix (e.g. `main`), or the alias `fuzz_target!` — no mangled name required. |
 | `--backend {type-based,svf}` | `type-based` | Indirect-call resolution backend. `svf` needs an SVF-enabled analyzer (`make build-svf`). |
-| `--artifact PATH` | `main.o` | C/C++ only: the built object/binary `get-bc` extracts whole-program bitcode from (relative to `--project`). |
+| `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive `get-bc` extracts whole-program bitcode from (relative to `--project`). If omitted, the build product is auto-detected by scanning the tree for the file carrying gllvm's embedded bitcode, preferring an executable over a shared lib, archive, then object. |
 | `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with gllvm wrappers injected. E.g. `"cmake -S . -B build && cmake --build build"`. If omitted, the build system is auto-detected from the project files (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, with an autotools-bootstrap fallback), defaulting to `make`. |
 | `--build-std` | off | Rust only: build the standard library from source too (`-Zbuild-std`), so std functions appear in the graph instead of as external declarations. |
 | `--dot FILE` | *(none)* | Also write the reachable subgraph as Graphviz DOT (indirect edges dashed/red). |
