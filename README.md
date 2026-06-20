@@ -11,7 +11,10 @@ ever reported unreachable. Over-reporting is expected and safe; under-reporting
 is a bug.
 
 Feed the output to clang's SanitizerCoverage allow/ignore lists to instrument
-only reachable code — cheaper, more focused fuzzing.
+only reachable code — cheaper, more focused fuzzing:
+- **AFL++**: `export AFL_LLVM_ALLOWLIST=$(pwd)/reached.txt` -or- `export AFL_LLVM_DENYLIST=$(pwd)/not_reached.txt`
+- **sancov based fuzzers** (libfuzzer, honggfuzz, libafl, AFL++): `-fsanitize-coverage-allowlist=$(pwd)/reached.txt` -or- `-fsanitize-coverage-ignorelist=$(pwd)/not_reached.txt`
+
 
 **Deep dives:**
 - Worked examples, step by step — a libFuzzer harness (libxml2), a ziggy harness (the `url` crate), and a cargo-afl harness (rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
