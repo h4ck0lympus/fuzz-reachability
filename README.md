@@ -54,7 +54,7 @@ Two components, joined by merged bitcode:
   **NOTE!** especially as a Rust user, we recommend to install LLVM via
   https://apt.llvm.org/llvm.sh instead of the distribution, as those will be outdated!
 - **Go** (to install `gllvm`), **Python ≥ 3.12**, and a **C++17** compiler. Rust
-  targets also need **rustc / cargo** (nightly).
+  targets also need **rustc / cargo** (nightly, but one using LLVM 21 or prior).
 
 ## Install
 
