@@ -15,6 +15,7 @@ only reachable code — cheaper, more focused fuzzing:
 - **AFL++**: `export AFL_LLVM_ALLOWLIST=$(pwd)/reached.txt` -or- `export AFL_LLVM_DENYLIST=$(pwd)/not_reached.txt`
 - **sancov based fuzzers** (libfuzzer, honggfuzz, libafl, AFL++): `-fsanitize-coverage-allowlist=$(pwd)/reached.txt` -or- `-fsanitize-coverage-ignorelist=$(pwd)/not_reached.txt`
 
+**Recommendation:** use the allow feature with `reached.txt` rather than the deny/ignore feature.
 
 **Deep dives:**
 - Worked examples, step by step — a generic `LLVMFuzzerTestOneInput` harness for AFL++/libfuzzer (libxml2), a ziggy harness (the `url` crate), and a cargo-afl harness (rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
