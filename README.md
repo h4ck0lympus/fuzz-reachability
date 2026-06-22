@@ -311,7 +311,7 @@ clang -fsanitize-coverage=trace-pc-guard -fsanitize-coverage-ignorelist=not_reac
 | Backend | Flag | Notes |
 |---------|------|-------|
 | Type-based (default) | `--backend=type-based` | Buckets address-taken functions by LLVM function type. Language-agnostic, always available, sound. |
-| SVF Andersen points-to | `--backend=svf` | Higher precision. Optional; built separately. Falls back to type-based for any callsite it cannot resolve. |
+| SVF Andersen points-to | `--backend=svf` | Higher precision: per-callsite points-to narrows the type-based over-approximation. Optional; built separately. Augments each callsite with the type-matched functions whose address escapes into memory (so it never misses a target SVF's points-to under-approximates, e.g. a callback stored into a struct field or global table), and falls back to the full type-based set for any callsite it cannot resolve. |
 
 SVF currently builds against **LLVM 21 only**. On LLVM 22/23 the default
 type-based backend is fully functional, and `--backend=svf` returns a clear error

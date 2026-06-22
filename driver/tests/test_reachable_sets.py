@@ -52,7 +52,7 @@ def _expected(fixture):
     return json.load(open(os.path.join(FIXTURES, fixture, "expected.json")))
 
 
-@pytest.mark.parametrize("fixture", ["c_direct", "c_fnptr", "cpp_virtual"])
+@pytest.mark.parametrize("fixture", ["c_direct", "c_fnptr", "cpp_virtual", "c_codec_table"])
 @pytest.mark.skipif(not HAVE_GLLVM, reason="gllvm not installed")
 def test_c_cpp_reachable(analyzer, tmp_path, fixture):
     work = tmp_path / fixture
@@ -132,7 +132,11 @@ def test_rust_only_entry_rooting(analyzer, tmp_path):
 # --- SVF backend: must satisfy the SAME soundness invariant as type-based ---
 
 
-@pytest.mark.parametrize("fixture", ["c_direct", "c_fnptr", "cpp_virtual"])
+# c_codec_table reproduces a real SVF under-approximation: a function pointer
+# stored into a struct field by an init function reached through a global codec
+# table is dropped by SVF's points-to (the libtiff PackBitsPreEncode bug). The
+# memory-escape augmentation must recover it.
+@pytest.mark.parametrize("fixture", ["c_direct", "c_fnptr", "cpp_virtual", "c_codec_table"])
 @pytest.mark.skipif(not HAVE_GLLVM, reason="gllvm not installed")
 def test_svf_c_cpp_sound(svf_analyzer, tmp_path, fixture):
     work = tmp_path / fixture

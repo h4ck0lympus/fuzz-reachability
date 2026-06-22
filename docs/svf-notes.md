@@ -39,9 +39,21 @@ level. No source patches were needed.
   (`LLVMModuleSet::buildSVFModule(Module&)`) so `getCallICFGNode` maps our exact
   call instructions, runs `AndersenWaveDiff`, and reads per-callsite callees via
   `getIndCSCallees`. Callees map back to `llvm::Function*` by name.
-- **Soundness:** for any indirect call SVF does not resolve, `SVFResolver` falls
-  back to the type-based resolver, so `--backend=svf` is never less sound than
-  the default.
+- **Soundness:** SVF reliably tracks function pointers that flow through SSA
+  values, direct call arguments, and returns, but its points-to
+  **under-approximates** pointers that escape through memory — a function
+  address stored into a struct field or a global table and later loaded and
+  called indirectly. (Found in libtiff: `PackBitsPreEncode` is wired up by
+  `TIFFInitPackBits` storing it into `tif->tif_preencode`, reached through the
+  `_TIFFBuiltinCODECS` table; raw SVF dropped it and reported it unreachable.)
+  So `SVFResolver` augments every per-callsite SVF set with the type-matched
+  functions whose address escapes into memory (a `store`, a global initializer,
+  a call argument, or a return — collected once in `prepare()`), and falls back
+  to the **full** type-based set for any callsite SVF leaves unresolved. SVF
+  therefore never misses a memory-resident target, while staying narrower than
+  type-based for the pointers it tracks precisely (those are decided by SVF
+  alone). The regression fixture `fixtures/c_codec_table` reproduces the dropped
+  target and is asserted sound under both backends.
 
 ## Gotchas handled
 
