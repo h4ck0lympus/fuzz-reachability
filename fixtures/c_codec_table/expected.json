@@ -1,0 +1,4 @@
+{
+  "must_reach": ["LLVMFuzzerTestOneInput", "init_a", "real_run"],
+  "must_not_reach": ["dead_run"]
+}
