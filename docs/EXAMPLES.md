@@ -85,6 +85,7 @@ reachability run --lang cpp \
   --entry LLVMFuzzerTestOneInput \
   --out libxml2.json -v
 ```
+Note the `--static-libs all` - this is important!
 
 What each piece does:
 
@@ -193,11 +194,14 @@ clang -fsanitize-coverage=trace-pc-guard -fsanitize-coverage-ignorelist=not_reac
 
 - **`gclang: not found` during the build.** Put gllvm on `PATH`
   (`export PATH="$(go env GOPATH)/bin:$PATH"`).
-- **`--static-libs all` fails to link** with a "symbol multiply defined" error.
-  That happens only when two archives in the tree define the same symbol.
-  libxml2's two archives (`libxml2.a`, `testdso.a`) do not collide, so it works
-  here; if your tree has archives that *do* overlap, build a fuzzer binary and
-  use `--static-libs auto` instead (see Step 3).
+- **`--static-libs all` and overlapping archives.** When two archives in the
+  tree share a member object — e.g. a portability helper archived into several
+  libraries, as with libtiff's `libport` ending up inside both `libtiff.a` and
+  `libtiffxx.a` — the planner drops any archive whose members are already covered
+  by a larger one, and the merge passes the remaining modules through
+  `llvm-link --override` so a residual duplicate symbol resolves to the last
+  definition instead of aborting with "symbol multiply defined". `all` therefore
+  links even when archives overlap; you no longer need to fall back to `auto`.
 - **`configure` fails on a very new system.** libxml2-2.9.2 predates current
   toolchains; the analyzer never treats warnings as errors, but if configure
   itself errors, add the flags the project needs (e.g. `--without-lzma`) to the

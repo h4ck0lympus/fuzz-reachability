@@ -27,6 +27,9 @@ def test_link_cmd_built(monkeypatch):
         return R()
 
     monkeypatch.setattr(subprocess, "run", fake_run)
-    link.link_bitcode(["a.bc", "b.bc"], "out.bc", _tc())
+    link.link_bitcode(["a.bc", "b.bc", "c.bc"], "out.bc", _tc())
     assert captured["cmd"][0] == "llvm-link"
     assert "-o" in captured["cmd"] and "out.bc" in captured["cmd"]
+    assert "a.bc" in captured["cmd"]
+    assert "--override=b.bc" in captured["cmd"] and "--override=c.bc" in captured["cmd"]
+    assert "b.bc" not in captured["cmd"] and "c.bc" not in captured["cmd"]

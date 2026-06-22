@@ -133,3 +133,16 @@ def test_plan_static_libs_auto_no_manifest_picks_nothing():
     chosen, roots = acquire_c._plan_static_libs([], members, "auto")
     assert chosen == []
     assert roots == []
+
+
+def test_plan_static_libs_all_skips_subset_archive():
+    manifest = ["/p/tools/.thumbnail.o.bc"]
+    members = {
+        "/p/port/libport.a": {"dummy.o"},
+        "/p/lt/libtiff.a": {"tif_aux.o", "tif_getimage.o", "dummy.o"},
+        "/p/lt/libtiffxx.a": {"tif_stream.o", "dummy.o"},
+    }
+    chosen, roots = acquire_c._plan_static_libs(manifest, members, "all")
+    assert set(chosen) == {"/p/lt/libtiff.a", "/p/lt/libtiffxx.a"}
+    assert "/p/port/libport.a" not in chosen
+    assert roots == ["/p/tools/.thumbnail.o.bc"]

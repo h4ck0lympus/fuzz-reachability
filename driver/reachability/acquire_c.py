@@ -12,9 +12,12 @@ library would otherwise be invisible to the analysis. With static_libs="auto"
 full (get-bc -b) and merged with the target's own (non-archive) objects, so every
 function in the library is classified reachable/unreachable rather than silently
 dropped. "none" keeps only the linker's view; "all" pulls in every bitcode
-archive found in the tree. Merging the full archive with the target's *non-archive*
-objects (its manifest minus the archive members) avoids the duplicate-symbol
-clash that linking the executable's own bitcode against the full archive causes.
+archive found in the tree, save those whose members are already covered by a
+larger one. Merging the full archive with the target's *non-archive* objects (its
+manifest minus the archive members) avoids the duplicate-symbol clash that linking
+the executable's own bitcode against the full archive causes; any residual overlap
+between two chosen archives (a shared member object) is resolved by the link stage
+(llvm-link --override).
 """
 
 import mmap
@@ -221,7 +224,11 @@ def _plan_static_libs(manifest, archive_members, mode):
     manifest: per-object .bc paths the linker pulled into the target.
     archive_members: {archive_path: {member object name, ...}}.
     mode: "auto" includes only archives the target links (members intersect the
-    manifest); "all" includes every archive given.
+    manifest); "all" includes every archive given. Either way archives are
+    considered largest-first and one whose members are already covered by an
+    archive chosen earlier is skipped, so an archive embedded whole into another
+    (e.g. libport, which is archived into both libtiff.a and libtiffxx.a) is not
+    pulled in twice.
 
     Returns (chosen_archive_paths, root_bc_paths): the roots are the manifest
     objects that belong to no chosen archive, so merging them with the full
@@ -230,10 +237,14 @@ def _plan_static_libs(manifest, archive_members, mode):
     manifest_member_names = {_member_name(p) for p in manifest}
     chosen = []
     union = set()
-    for arch, members in archive_members.items():
+    ordered = sorted(archive_members.items(),
+                     key=lambda kv: len(kv[1]), reverse=True)
+    for arch, members in ordered:
         if not members:
             continue
         if mode == "all" or (mode == "auto" and members & manifest_member_names):
+            if members <= union:
+                continue
             chosen.append(arch)
             union |= members
     roots = [p for p in manifest if _member_name(p) not in union]
