@@ -11,7 +11,8 @@ on every fixture.
 The top risk in the spec (§8) was SVF lagging LLVM releases. As of the pinned
 commit, **SVF master already targets LLVM 21.1.x** (`setup.sh` references
 `llvm-21.1.0.obj`), which matches our system LLVM 21.1.8 at the major+minor
-level. No source patches were needed.
+level. One small source patch is applied to SVF's type inference — see gotcha
+6 below.
 
 ## Build recipe (`scripts/build_svf.sh`)
 
@@ -71,6 +72,24 @@ level. No source patches were needed.
    compile-time `REACHABILITY_SVF_EXTAPI` path, so no `SVF_DIR` env is required.
 5. **stdout pollution** — SVF dumps statistics to stdout by default; disabled via
    `Options::PStat=false` so the analyzer's JSON stays clean on stdout.
+6. **`ObjTypeInference` abort on void/non-returning callees** — during
+   `SVFIRBuilder::build()`, SVF's object type inference back-traces a value to a
+   `call` and follows the callee's return value to find the underlying
+   allocation. Both back-tracers (`bwfindAllocOfVar`, `fwFindAllocOrClsNameSources`
+   in `svf-llvm/lib/ObjTypeInference.cpp`) ran
+   `ABORT_IFNOT(retInst && retInst->getReturnValue(), "not return inst?")`, an
+   unconditional `abort()` (SIGABRT → analyzer exits -6). It fires whenever the
+   callee's exit block has no value-returning `ret` (returns `void`, ends in
+   `unreachable`/infinite loop, or is noreturn but not annotated — the
+   `doesNotReturn()` guard misses those, and `LLVMModule.cpp` falls back to the
+   last block as exit BB regardless). Patched to skip gracefully (`if (retInst &&
+   retInst->getReturnValue()) insert...`): such a call simply isn't an allocation
+   source, which is sound for this best-effort inference. The patch is tracked as
+   `scripts/svf-objtypeinference-abort.patch` and reapplied idempotently by
+   `scripts/build_svf.sh` after every `git checkout` (it skips when already
+   applied), so a fresh clone or hard-reset of the vendored, gitignored SVF tree
+   self-heals on the next `make build-svf`. To add further SVF source patches,
+   drop a `scripts/svf-*.patch` file — the build script applies them all.
 
 ## If SVF ever stops building against the pinned LLVM
 

@@ -1,0 +1,26 @@
+diff --git a/svf-llvm/lib/ObjTypeInference.cpp b/svf-llvm/lib/ObjTypeInference.cpp
+index 94d09a3e..c897994c 100644
+--- a/svf-llvm/lib/ObjTypeInference.cpp
++++ b/svf-llvm/lib/ObjTypeInference.cpp
+@@ -636,8 +636,8 @@ Set<const Value *> &ObjTypeInference::bwfindAllocOfVar(const Value *var)
+                     assert (exitBB && "exit bb is not a basic block?");
+                     const Value *pValue = &exitBB->back();
+                     const auto *retInst = SVFUtil::dyn_cast<ReturnInst>(pValue);
+-                    ABORT_IFNOT(retInst && retInst->getReturnValue(), "not return inst?");
+-                    insertAllocsOrPushWorklist(retInst->getReturnValue());
++                    if (retInst && retInst->getReturnValue())
++                        insertAllocsOrPushWorklist(retInst->getReturnValue());
+                 }
+             }
+         }
+@@ -944,8 +944,8 @@ Set<const Value *> &ObjTypeInference::bwFindAllocOrClsNameSources(const Value *s
+                     assert (exitBB && "exit bb is not a basic block?");
+                     const Value *pValue = &exitBB->back();
+                     const auto *retInst = SVFUtil::dyn_cast<ReturnInst>(pValue);
+-                    ABORT_IFNOT(retInst && retInst->getReturnValue(), "not return inst?");
+-                    insertSourcesOrPushWorklist(retInst->getReturnValue());
++                    if (retInst && retInst->getReturnValue())
++                        insertSourcesOrPushWorklist(retInst->getReturnValue());
+                 }
+             }
+         }

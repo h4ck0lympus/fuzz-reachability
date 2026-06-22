@@ -46,6 +46,20 @@ fi
 ( cd "$SVF_DIR" && git checkout -q "$SVF_COMMIT" 2>/dev/null \
     || { git fetch --depth 1 origin "$SVF_COMMIT" && git checkout -q "$SVF_COMMIT"; } )
 
+# --- local SVF source patches (idempotent; reapplied after every checkout so a
+# fresh clone or hard-reset self-heals). See docs/svf-notes.md gotcha 6. ---
+for patch in "$ROOT"/scripts/svf-*.patch; do
+  [ -e "$patch" ] || continue
+  if git -C "$SVF_DIR" apply --reverse --check "$patch" 2>/dev/null; then
+    echo "[svf] patch already applied: $(basename "$patch")"
+  elif git -C "$SVF_DIR" apply --check "$patch" 2>/dev/null; then
+    git -C "$SVF_DIR" apply "$patch"
+    echo "[svf] applied patch: $(basename "$patch")"
+  else
+    echo "[svf] WARNING: cannot apply $(basename "$patch") -- context drift; the patched abort may resurface" >&2
+  fi
+done
+
 # --- configure + build against the chosen LLVM + downloaded Z3 ---
 echo "[svf] building against LLVM $MAJOR ($LLVM_DIR) -> $INSTALL_DIR"
 # Drop a stale CMake cache (e.g. a build dir that was moved/renamed): cmake
