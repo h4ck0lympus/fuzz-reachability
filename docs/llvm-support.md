@@ -19,9 +19,11 @@ analyzer.** The rules enforced by `reachability check-toolchain`
    read rustc's bitcode (`llvm-link: Invalid record`) — this is the common gotcha
    when a distro ships, say, LLVM 21.0.0 while rustc bundles 21.1.1.
 
-The default build LLVM is chosen by `scripts/select_llvm.sh`: the smallest
-installed `llvm-config-N` (N ≥ 21) whose **full** version can read rustc's
-bitcode. Override it explicitly at build time:
+The default build LLVM is chosen by `scripts/select_llvm.sh`: `llvm-config-21`
+if installed, otherwise the newest installed `llvm-config-N` (N > 21). For Rust
+targets make sure the chosen LLVM's **full** version is no older than rustc's
+bundled LLVM, or it cannot read rustc's bitcode; override it explicitly at build
+time:
 
 ```bash
 make build LLVM_MAJOR=23      # analyzer on LLVM 23 (uses llvm-config-23, clang-23, …)

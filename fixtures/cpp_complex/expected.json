@@ -6,9 +6,9 @@
   ],
   "summary": {
     "defined": 199,
-    "reachable": 183,
-    "indirect_only": 52,
-    "unreachable": 16
+    "reachable": 186,
+    "indirect_only": 55,
+    "unreachable": 13
   },
   "reachable": [
     {
@@ -1444,6 +1444,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "atexit_handler_fn",
+      "demangled": "atexit_handler_fn",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
+      "mangled": "callback_qsort_cmp",
+      "demangled": "callback_qsort_cmp",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
       "mangled": "dlsym_target_fn",
       "demangled": "dlsym_target_fn",
       "file": null,
@@ -1454,6 +1470,14 @@
     {
       "mangled": "ifunc_impl_default",
       "demangled": "ifunc_impl_default",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
+      "mangled": "pthread_start_fn",
+      "demangled": "pthread_start_fn",
       "file": null,
       "line": null,
       "via": "indirect",
@@ -1550,26 +1574,8 @@
       "line": null
     },
     {
-      "mangled": "atexit_handler_fn",
-      "demangled": "atexit_handler_fn",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "callback_qsort_cmp",
-      "demangled": "callback_qsort_cmp",
-      "file": null,
-      "line": null
-    },
-    {
       "mangled": "ifunc_target_resolver",
       "demangled": "ifunc_target_resolver",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "pthread_start_fn",
-      "demangled": "pthread_start_fn",
       "file": null,
       "line": null
     }

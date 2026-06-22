@@ -6,9 +6,9 @@
   ],
   "summary": {
     "defined": 1196,
-    "reachable": 1102,
-    "indirect_only": 102,
-    "unreachable": 94
+    "reachable": 1177,
+    "indirect_only": 111,
+    "unreachable": 19
   },
   "reachable": [
     {
@@ -364,6 +364,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZL23atexit_callback_handlerv",
+      "demangled": "atexit_callback_handler()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
       "mangled": "_ZL23lambda_conversion_entryR11fuzz_stream",
       "demangled": "lambda_conversion_entry(fuzz_stream&)",
       "file": null,
@@ -396,6 +404,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZL24c_callback_qsort_comparePKvS0_",
+      "demangled": "c_callback_qsort_compare(void const*, void const*)",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
       "mangled": "_ZL24exception_unwind_throweri",
       "demangled": "exception_unwind_thrower(int)",
       "file": null,
@@ -414,6 +430,14 @@
     {
       "mangled": "_ZL24std_invoke_free_functioni",
       "demangled": "std_invoke_free_function(int)",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
+      "mangled": "_ZL24terminate_handler_customv",
+      "demangled": "terminate_handler_custom()",
       "file": null,
       "line": null,
       "via": "indirect",
@@ -1772,6 +1796,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNKSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE3getEv",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::get() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNKSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEptEv",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::operator->() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNKSt10unique_ptrINSt13__future_base7_ResultIiEENS0_12_Result_base8_DeleterEE3getEv",
       "demangled": "std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>::get() const",
       "file": null,
@@ -1972,6 +2012,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNKSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEclEPS2_",
+      "demangled": "std::default_delete<std::__future_base::_State_baseV2::_Make_ready>::operator()(std::__future_base::_State_baseV2::_Make_ready*) const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNKSt14default_deleteINSt6thread6_StateEEclEPS1_",
       "demangled": "std::default_delete<std::thread::_State>::operator()(std::thread::_State*) const",
       "file": null,
@@ -1998,6 +2046,14 @@
     {
       "mangled": "_ZNKSt15__uniq_ptr_implINSt13__future_base12_Result_baseENS1_8_DeleterEE6_M_ptrEv",
       "demangled": "std::__uniq_ptr_impl<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>::_M_ptr() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNKSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE6_M_ptrEv",
+      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_ptr() const",
       "file": null,
       "line": null,
       "via": "direct",
@@ -2348,6 +2404,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNKSt8functionIFSt10unique_ptrINSt13__future_base12_Result_baseENS2_8_DeleterEEvEEclEv",
+      "demangled": "std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNKSt8functionIFiiEEclEi",
       "demangled": "std::function<int (int)>::operator()(int) const",
       "file": null,
@@ -2564,6 +2628,30 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EE7_M_headERKS4_",
+      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_M_head(std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false> const&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EE7_M_headERS4_",
+      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_M_head(std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EEC2Ev",
+      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_Head_base()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base7_ResultIiEELb0EE7_M_headERKS4_",
       "demangled": "std::_Head_base<0ul, std::__future_base::_Result<int>*, false>::_M_head(std::_Head_base<0ul, std::__future_base::_Result<int>*, false> const&)",
       "file": null,
@@ -2748,6 +2836,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt10_Head_baseILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEELb1EE7_M_headERS5_",
+      "demangled": "std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>::_M_head(std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10_Head_baseILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEELb1EEC2Ev",
+      "demangled": "std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>::_Head_base()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt10_Head_baseILm1ESt14default_deleteINSt6thread6_StateEELb1EE7_M_headERS4_",
       "demangled": "std::_Head_base<1ul, std::default_delete<std::thread::_State>, true>::_M_head(std::_Head_base<1ul, std::default_delete<std::thread::_State>, true>&)",
       "file": null,
@@ -2798,6 +2902,46 @@
     {
       "mangled": "_ZNSt10_Head_baseILm2EiLb0EEC2IiEEOT_",
       "demangled": "std::_Head_base<2ul, int, false>::_Head_base<int>(int&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EE4swapERS4_",
+      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::swap(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEC2EOS4_",
+      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::__weak_ptr(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEC2Ev",
+      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::__weak_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EED2Ev",
+      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::~__weak_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEaSEOS4_",
+      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::operator=(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -3030,6 +3174,38 @@
     {
       "mangled": "_ZNSt10unique_ptrINSt13__future_base12_Result_baseENS1_8_DeleterEED2Ev",
       "demangled": "std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>::~unique_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE11get_deleterEv",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::get_deleter()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE7releaseEv",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::release()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEC2IS4_vEEPS2_",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::unique_ptr<std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, void>(std::__future_base::_State_baseV2::_Make_ready*)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EED2Ev",
+      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::~unique_ptr()",
       "file": null,
       "line": null,
       "via": "direct",
@@ -3276,6 +3452,30 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEE7_M_headERKS6_",
+      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEE7_M_headERS6_",
+      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEEC2Ev",
+      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_Tuple_impl()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base7_ResultIiEENS0_12_Result_base8_DeleterEEE7_M_headERKS6_",
       "demangled": "std::_Tuple_impl<0ul, std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>::_M_head(std::_Tuple_impl<0ul, std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter> const&)",
       "file": null,
@@ -3470,6 +3670,22 @@
     {
       "mangled": "_ZNSt11_Tuple_implILm1EJSt14default_deleteI25control_block_erased_baseEEEC2Ev",
       "demangled": "std::_Tuple_impl<1ul, std::default_delete<control_block_erased_base>>::_Tuple_impl()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt11_Tuple_implILm1EJSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEEE7_M_headERS5_",
+      "demangled": "std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt11_Tuple_implILm1EJSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEEEC2Ev",
+      "demangled": "std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_Tuple_impl()",
       "file": null,
       "line": null,
       "via": "direct",
@@ -3876,6 +4092,38 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EE7_M_swapERS2_",
+      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::_M_swap(std::__weak_count<(__gnu_cxx::_Lock_policy)2>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EEC2EOS2_",
+      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::__weak_count(std::__weak_count<(__gnu_cxx::_Lock_policy)2>&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EEC2Ev",
+      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::__weak_count()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EED2Ev",
+      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::~__weak_count()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt12future_errorC2ERKS_",
       "demangled": "std::future_error::future_error(std::future_error const&)",
       "file": null,
@@ -3906,6 +4154,14 @@
       "line": null,
       "via": "direct",
       "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt13__future_base11_Task_stateIPFiiESaIiES1_E14_M_run_delayedEOiSt8weak_ptrINS_13_State_baseV2EE",
+      "demangled": "std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
     },
     {
       "mangled": "_ZNSt13__future_base11_Task_stateIPFiiESaIiES1_E5_ImplC2IRS1_EEOT_RKS3_",
@@ -3980,6 +4236,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt13__future_base13_State_baseV211_Make_readyC2Ev",
+      "demangled": "std::__future_base::_State_baseV2::_Make_ready::_Make_ready()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt13__future_base13_State_baseV211_Make_readyD2Ev",
+      "demangled": "std::__future_base::_State_baseV2::_Make_ready::~_Make_ready()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt13__future_base13_State_baseV213_M_set_resultESt8functionIFSt10unique_ptrINS_12_Result_baseENS3_8_DeleterEEvEEb",
       "demangled": "std::__future_base::_State_baseV2::_M_set_result(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>, bool)",
       "file": null,
@@ -4002,6 +4274,14 @@
       "line": null,
       "via": "indirect",
       "indirect_only": true
+    },
+    {
+      "mangled": "_ZNSt13__future_base13_State_baseV221_M_set_delayed_resultESt8functionIFSt10unique_ptrINS_12_Result_baseENS3_8_DeleterEEvEESt8weak_ptrIS0_E",
+      "demangled": "std::__future_base::_State_baseV2::_M_set_delayed_result(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>, std::weak_ptr<std::__future_base::_State_baseV2>)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
     },
     {
       "mangled": "_ZNSt13__future_base13_State_baseV221_M_set_retrieved_flagEv",
@@ -4036,6 +4316,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt13__future_base13_State_baseV29_M_do_setEPSt8functionIFSt10unique_ptrINS_12_Result_baseENS3_8_DeleterEEvEEPb",
+      "demangled": "std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*)",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
       "mangled": "_ZNSt13__future_base13_State_baseV2C2Ev",
       "demangled": "std::__future_base::_State_baseV2::_State_baseV2()",
       "file": null,
@@ -4062,6 +4350,14 @@
     {
       "mangled": "_ZNSt13__future_base14_S_task_setterISt10unique_ptrINS_7_ResultIiEENS_12_Result_base8_DeleterEENSt6thread8_InvokerISt5tupleIJPFiiEiEEEEEENS_12_Task_setterIT_T0_NSF_12element_type11result_typeEEERSF_RSG_",
       "demangled": "std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<int (*)(int), int>>, std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>::element_type::result_type> std::__future_base::_S_task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<int (*)(int), int>>>(std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>&, std::thread::_Invoker<std::tuple<int (*)(int), int>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt13__future_base14_S_task_setterISt10unique_ptrINS_7_ResultIiEENS_12_Result_base8_DeleterEEZNS_11_Task_stateIPFiiESaIiES8_E14_M_run_delayedEOiSt8weak_ptrINS_13_State_baseV2EEEUlvE_EENS_12_Task_setterIT_T0_NSI_12element_type11result_typeEEERSI_RSJ_",
+      "demangled": "std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>::element_type::result_type> std::__future_base::_S_task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'()>(std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>&, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'()&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -4404,8 +4700,32 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE15_M_init_functorISJ_EEvRSt9_Any_dataOT_",
+      "demangled": "void std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_init_functor<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::_Any_data&, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE21_M_not_empty_functionISJ_EEbRKT_",
+      "demangled": "bool std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_not_empty_function<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int> const&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE9_M_createIRKSJ_EEvRSt9_Any_dataOT_St17integral_constantIbLb1EE",
       "demangled": "void std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_create<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int> const&>(std::_Any_data&, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int> const&, std::integral_constant<bool, true>)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE9_M_createISJ_EEvRSt9_Any_dataOT_St17integral_constantIbLb1EE",
+      "demangled": "void std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_create<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::_Any_data&, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&, std::integral_constant<bool, true>)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -5044,6 +5364,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt15__uniq_ptr_dataINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_ELb1ELb1EECI2St15__uniq_ptr_implIS2_S4_EEPS2_",
+      "demangled": "std::__uniq_ptr_data<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true, true>::__uniq_ptr_data(std::__future_base::_State_baseV2::_Make_ready*)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt15__uniq_ptr_dataINSt13__future_base7_ResultIiEENS0_12_Result_base8_DeleterELb1ELb1EEC2EOS5_",
       "demangled": "std::__uniq_ptr_data<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter, true, true>::__uniq_ptr_data(std::__uniq_ptr_data<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter, true, true>&&)",
       "file": null,
@@ -5158,6 +5486,38 @@
     {
       "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base12_Result_baseENS1_8_DeleterEEC2IS2_EEPS1_OT_",
       "demangled": "std::__uniq_ptr_impl<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>::__uniq_ptr_impl<std::__future_base::_Result_base::_Deleter>(std::__future_base::_Result_base*, std::__future_base::_Result_base::_Deleter&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE10_M_deleterEv",
+      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_deleter()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE6_M_ptrEv",
+      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE7releaseEv",
+      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::release()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEC2EPS2_",
+      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::__uniq_ptr_impl(std::__future_base::_State_baseV2::_Make_ready*)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -5294,6 +5654,14 @@
     {
       "mangled": "_ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE15_M_add_ref_copyEv",
       "demangled": "std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_add_ref_copy()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE15_M_weak_releaseEv",
+      "demangled": "std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release()",
       "file": null,
       "line": null,
       "via": "direct",
@@ -5924,6 +6292,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt5tupleIJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEEC2EvQfraa26is_default_constructible_vIT_E",
+      "demangled": "std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::tuple() requires ((is_default_constructible_v<T>...) && ...)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt5tupleIJPNSt13__future_base7_ResultIiEENS0_12_Result_base8_DeleterEEEC2EOS6_",
       "demangled": "std::tuple<std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>::tuple(std::tuple<std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>&&)",
       "file": null,
@@ -6058,6 +6434,14 @@
       "line": null,
       "via": "both",
       "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt6thread24_M_thread_deps_never_runEv",
+      "demangled": "std::thread::_M_thread_deps_never_run()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
     },
     {
       "mangled": "_ZNSt6thread2idC2Ev",
@@ -6964,6 +7348,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZNSt8functionIFSt10unique_ptrINSt13__future_base12_Result_baseENS2_8_DeleterEEvEEC2INS1_12_Task_setterIS0_INS1_7_ResultIiEES3_EZNS1_11_Task_stateIPFiiESaIiESD_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEvEEOT_",
+      "demangled": "std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::function<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>, void>(std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZNSt8functionIFSt10unique_ptrINSt13__future_base12_Result_baseENS2_8_DeleterEEvEEC2INS1_12_Task_setterIS0_INS1_7_ResultIiEES3_EZNS1_11_Task_stateIPFiiESaIiESD_E6_M_runEOiEUlvE_iEEvEEOT_",
       "demangled": "std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::function<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run(int&&)::'lambda'(), int>, void>(std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run(int&&)::'lambda'(), int>&&)",
       "file": null,
@@ -6990,6 +7382,38 @@
     {
       "mangled": "_ZNSt8functionIFiiEED2Ev",
       "demangled": "std::function<int (int)>::~function()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEC2EOS2_",
+      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::weak_ptr(std::weak_ptr<std::__future_base::_State_baseV2>&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEC2Ev",
+      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::weak_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EED2Ev",
+      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::~weak_ptr()",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEaSEOS2_",
+      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::operator=(std::weak_ptr<std::__future_base::_State_baseV2>&&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -7436,6 +7860,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZSt12__get_helperILm0EPNSt13__future_base13_State_baseV211_Make_readyEJSt14default_deleteIS2_EEERKT0_RKSt11_Tuple_implIXT_EJS6_DpT1_EE",
+      "demangled": "std::__future_base::_State_baseV2::_Make_ready* const& std::__get_helper<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt12__get_helperILm0EPNSt13__future_base13_State_baseV211_Make_readyEJSt14default_deleteIS2_EEERT0_RSt11_Tuple_implIXT_EJS6_DpT1_EE",
+      "demangled": "std::__future_base::_State_baseV2::_Make_ready*& std::__get_helper<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZSt12__get_helperILm0EPNSt13__future_base7_ResultIiEEJNS0_12_Result_base8_DeleterEEERKT0_RKSt11_Tuple_implIXT_EJS6_DpT1_EE",
       "demangled": "std::__future_base::_Result<int>* const& std::__get_helper<0ul, std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>(std::_Tuple_impl<0ul, std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter> const&)",
       "file": null,
@@ -7526,6 +7966,14 @@
     {
       "mangled": "_ZSt12__get_helperILm1ESt14default_deleteI25control_block_erased_baseEJEERT0_RSt11_Tuple_implIXT_EJS3_DpT1_EE",
       "demangled": "std::default_delete<control_block_erased_base>& std::__get_helper<1ul, std::default_delete<control_block_erased_base>>(std::_Tuple_impl<1ul, std::default_delete<control_block_erased_base>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt12__get_helperILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEJEERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE",
+      "demangled": "std::default_delete<std::__future_base::_State_baseV2::_Make_ready>& std::__get_helper<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -7732,6 +8180,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZSt13__invoke_implIvMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEPS1_JS9_SA_EET_St21__invoke_memfun_derefOT0_OT1_DpOT2_",
+      "demangled": "void std::__invoke_impl<void, void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::__invoke_memfun_deref, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZSt13__invoke_implIvMNSt13__future_base17_Async_state_implINSt6thread8_InvokerISt5tupleIJPFiiEiEEEEiEEFvvEPS9_JEET_St21__invoke_memfun_derefOT0_OT1_DpOT2_",
       "demangled": "void std::__invoke_impl<void, void (std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>::*)(), std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>*>(std::__invoke_memfun_deref, void (std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>::*&&)(), std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>*&&)",
       "file": null,
@@ -7740,8 +8196,24 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZSt13__invoke_implIvMSt6threadFvvEPS0_JEET_St21__invoke_memfun_derefOT0_OT1_DpOT2_",
+      "demangled": "void std::__invoke_impl<void, void (std::thread::*)(), std::thread*>(std::__invoke_memfun_deref, void (std::thread::*&&)(), std::thread*&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZSt13__invoke_implIvPFviEJiEET_St14__invoke_otherOT0_DpOT1_",
       "demangled": "void std::__invoke_impl<void, void (*)(int), int>(std::__invoke_other, void (*&&)(int), int&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt13__invoke_implIvZL21atexit_callback_entryR11fuzz_streamE3$_0JEET_St14__invoke_otherOT0_DpOT1_",
+      "demangled": "void std::__invoke_impl<void, atexit_callback_entry(fuzz_stream&)::$_0>(std::__invoke_other, atexit_callback_entry(fuzz_stream&)::$_0&&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -7996,6 +8468,22 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZSt3getILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERKNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERKSA_",
+      "demangled": "std::tuple_element<0ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type const& std::get<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt3getILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERSA_",
+      "demangled": "std::tuple_element<0ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type& std::get<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZSt3getILm0EJPNSt13__future_base7_ResultIiEENS0_12_Result_base8_DeleterEEERKNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERKSA_",
       "demangled": "std::tuple_element<0ul, std::tuple<std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>>::type const& std::get<0ul, std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter>(std::tuple<std::__future_base::_Result<int>*, std::__future_base::_Result_base::_Deleter> const&)",
       "file": null,
@@ -8094,6 +8582,14 @@
     {
       "mangled": "_ZSt3getILm1EJPNSt13__future_base12_Result_baseENS1_8_DeleterEEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERS8_",
       "demangled": "std::tuple_element<1ul, std::tuple<std::__future_base::_Result_base*, std::__future_base::_Result_base::_Deleter>>::type& std::get<1ul, std::__future_base::_Result_base*, std::__future_base::_Result_base::_Deleter>(std::tuple<std::__future_base::_Result_base*, std::__future_base::_Result_base::_Deleter>&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt3getILm1EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERSA_",
+      "demangled": "std::tuple_element<1ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type& std::get<1ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -8364,8 +8860,24 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZSt8__invokeIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEJPS1_S9_SA_EENSt15__invoke_resultIT_JDpT0_EE4typeEOSF_DpOSG_",
+      "demangled": "std::__invoke_result<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>::type std::__invoke<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZSt8__invokeIMNSt13__future_base17_Async_state_implINSt6thread8_InvokerISt5tupleIJPFiiEiEEEEiEEFvvEJPS9_EENSt15__invoke_resultIT_JDpT0_EE4typeEOSE_DpOSF_",
       "demangled": "std::__invoke_result<void (std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>::*)(), std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>*>::type std::__invoke<void (std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>::*)(), std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>*>(void (std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>::*&&)(), std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>*&&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt8__invokeIMSt6threadFvvEJPS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS5_DpOS6_",
+      "demangled": "std::__invoke_result<void (std::thread::*)(), std::thread*>::type std::__invoke<void (std::thread::*)(), std::thread*>(void (std::thread::*&&)(), std::thread*&&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -8406,6 +8918,14 @@
     {
       "mangled": "_ZSt8__invokeIRPFiiiiEJRiiS3_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS5_DpOS6_",
       "demangled": "std::__invoke_result<int (*&)(int, int, int), int&, int, int&>::type std::__invoke<int (*&)(int, int, int), int&, int, int&>(int (*&)(int, int, int), int&, int&&, int&)",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZSt8__invokeIZL21atexit_callback_entryR11fuzz_streamE3$_0JEENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_",
+      "demangled": "std::__invoke_result<atexit_callback_entry(fuzz_stream&)::$_0>::type std::__invoke<atexit_callback_entry(fuzz_stream&)::$_0>(atexit_callback_entry(fuzz_stream&)::$_0&&)",
       "file": null,
       "line": null,
       "via": "direct",
@@ -8548,6 +9068,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZZL21atexit_callback_entryR11fuzz_streamENK3$_0clEv",
+      "demangled": "atexit_callback_entry(fuzz_stream&)::$_0::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZZL23lambda_conversion_entryR11fuzz_streamEN3$_08__invokeEi",
       "demangled": "lambda_conversion_entry(fuzz_stream&)::$_0::__invoke(int)",
       "file": null,
@@ -8644,8 +9172,32 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS3_12_Result_baseENS7_8_DeleterEEvEEPbEJPS4_SC_SD_EEvRS_OT_DpOT0_EUlvE_EERSI_ENKUlvE_clEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::'lambda'()::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS3_12_Result_baseENS7_8_DeleterEEvEEPbEJPS4_SC_SD_EEvRS_OT_DpOT0_EUlvE_EERSI_ENKUlvE_cvPFvvEEv",
       "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::'lambda'()::operator void (*)()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS3_12_Result_baseENS7_8_DeleterEEvEEPbEJPS4_SC_SD_EEvRS_OT_DpOT0_EUlvE_EERSI_ENUlvE_8__invokeEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::'lambda'()::__invoke()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMSt6threadFvvEJPS3_EEvRS_OT_DpOT0_EUlvE_EERS8_ENKUlvE_clEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()>(void (std::thread::*&)())::'lambda'()::operator()() const",
       "file": null,
       "line": null,
       "via": "direct",
@@ -8660,12 +9212,36 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMSt6threadFvvEJPS3_EEvRS_OT_DpOT0_EUlvE_EERS8_ENUlvE_8__invokeEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()>(void (std::thread::*&)())::'lambda'()::__invoke()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRS_OT_DpOT0_EUlvE_EERS7_ENKUlvE_clEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()>(atexit_callback_entry(fuzz_stream&)::$_0&)::'lambda'()::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
       "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRS_OT_DpOT0_EUlvE_EERS7_ENKUlvE_cvPFvvEEv",
       "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()>(atexit_callback_entry(fuzz_stream&)::$_0&)::'lambda'()::operator void (*)()() const",
       "file": null,
       "line": null,
       "via": "direct",
       "indirect_only": false
+    },
+    {
+      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRS_OT_DpOT0_EUlvE_EERS7_ENUlvE_8__invokeEv",
+      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()>(atexit_callback_entry(fuzz_stream&)::$_0&)::'lambda'()::__invoke()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
     },
     {
       "mangled": "_ZZSt10__do_visitINSt8__detail9__variant21__deduce_visit_resultIiEE21variant_visit_visitorJRSt7variantIJiNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEdEEEEDcOT0_DpOT1_ENKUlSD_zE_clB5cxx11ESD_z",
@@ -8686,6 +9262,30 @@
     {
       "mangled": "_ZZSt39uninitialized_construct_using_allocatorIiNSt3pmr21polymorphic_allocatorIiEEJiEEPT_S4_RKT0_DpOT1_ENKUlDpOT_E_clIJiEEEDaSD_",
       "demangled": "auto int* std::uninitialized_construct_using_allocator<int, std::pmr::polymorphic_allocator<int>, int>(int*, std::pmr::polymorphic_allocator<int> const&, int&&)::'lambda'(auto&&...)::operator()<int>(auto&&...) const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEJPS1_S9_SA_EEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
+      "demangled": "void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZZSt9call_onceIMSt6threadFvvEJPS0_EEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
+      "demangled": "void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()::operator()() const",
+      "file": null,
+      "line": null,
+      "via": "direct",
+      "indirect_only": false
+    },
+    {
+      "mangled": "_ZZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
+      "demangled": "void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()::operator()() const",
       "file": null,
       "line": null,
       "via": "direct",
@@ -8836,24 +9436,6 @@
       "line": null
     },
     {
-      "mangled": "_ZL23atexit_callback_handlerv",
-      "demangled": "atexit_callback_handler()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZL24c_callback_qsort_comparePKvS0_",
-      "demangled": "c_callback_qsort_compare(void const*, void const*)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZL24terminate_handler_customv",
-      "demangled": "terminate_handler_custom()",
-      "file": null,
-      "line": null
-    },
-    {
       "mangled": "_ZL26c_callback_bsearch_comparePKvS0_",
       "demangled": "c_callback_bsearch_compare(void const*, void const*)",
       "file": null,
@@ -8884,18 +9466,6 @@
       "line": null
     },
     {
-      "mangled": "_ZNKSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE3getEv",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::get() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNKSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEptEv",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::operator->() const",
-      "file": null,
-      "line": null
-    },
-    {
       "mangled": "_ZNKSt13__future_base13_State_baseV221_M_is_deferred_futureEv",
       "demangled": "std::__future_base::_State_baseV2::_M_is_deferred_future() const",
       "file": null,
@@ -8908,24 +9478,6 @@
       "line": null
     },
     {
-      "mangled": "_ZNKSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEclEPS2_",
-      "demangled": "std::default_delete<std::__future_base::_State_baseV2::_Make_ready>::operator()(std::__future_base::_State_baseV2::_Make_ready*) const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNKSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE6_M_ptrEv",
-      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_ptr() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNKSt8functionIFSt10unique_ptrINSt13__future_base12_Result_baseENS2_8_DeleterEEvEEclEv",
-      "demangled": "std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
       "mangled": "_ZNKSt9type_info4nameEv",
       "demangled": "std::type_info::name() const",
       "file": null,
@@ -8934,234 +9486,6 @@
     {
       "mangled": "_ZNKSt9type_infoeqERKS_",
       "demangled": "std::type_info::operator==(std::type_info const&) const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EE7_M_headERKS4_",
-      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_M_head(std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false> const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EE7_M_headERS4_",
-      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_M_head(std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10_Head_baseILm0EPNSt13__future_base13_State_baseV211_Make_readyELb0EEC2Ev",
-      "demangled": "std::_Head_base<0ul, std::__future_base::_State_baseV2::_Make_ready*, false>::_Head_base()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10_Head_baseILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEELb1EE7_M_headERS5_",
-      "demangled": "std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>::_M_head(std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10_Head_baseILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEELb1EEC2Ev",
-      "demangled": "std::_Head_base<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true>::_Head_base()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EE4swapERS4_",
-      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::swap(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEC2EOS4_",
-      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::__weak_ptr(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEC2Ev",
-      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::__weak_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EED2Ev",
-      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::~__weak_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10__weak_ptrINSt13__future_base13_State_baseV2ELN9__gnu_cxx12_Lock_policyE2EEaSEOS4_",
-      "demangled": "std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>::operator=(std::__weak_ptr<std::__future_base::_State_baseV2, (__gnu_cxx::_Lock_policy)2>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE11get_deleterEv",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::get_deleter()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE7releaseEv",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::release()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEC2IS4_vEEPS2_",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::unique_ptr<std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, void>(std::__future_base::_State_baseV2::_Make_ready*)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt10unique_ptrINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EED2Ev",
-      "demangled": "std::unique_ptr<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::~unique_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEE7_M_headERKS6_",
-      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEE7_M_headERS6_",
-      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt11_Tuple_implILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEEC2Ev",
-      "demangled": "std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_Tuple_impl()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt11_Tuple_implILm1EJSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEEE7_M_headERS5_",
-      "demangled": "std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_head(std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt11_Tuple_implILm1EJSt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEEEC2Ev",
-      "demangled": "std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_Tuple_impl()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EE7_M_swapERS2_",
-      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::_M_swap(std::__weak_count<(__gnu_cxx::_Lock_policy)2>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EEC2EOS2_",
-      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::__weak_count(std::__weak_count<(__gnu_cxx::_Lock_policy)2>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EEC2Ev",
-      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::__weak_count()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt12__weak_countILN9__gnu_cxx12_Lock_policyE2EED2Ev",
-      "demangled": "std::__weak_count<(__gnu_cxx::_Lock_policy)2>::~__weak_count()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base11_Task_stateIPFiiESaIiES1_E14_M_run_delayedEOiSt8weak_ptrINS_13_State_baseV2EE",
-      "demangled": "std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base13_State_baseV211_Make_readyC2Ev",
-      "demangled": "std::__future_base::_State_baseV2::_Make_ready::_Make_ready()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base13_State_baseV211_Make_readyD2Ev",
-      "demangled": "std::__future_base::_State_baseV2::_Make_ready::~_Make_ready()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base13_State_baseV221_M_set_delayed_resultESt8functionIFSt10unique_ptrINS_12_Result_baseENS3_8_DeleterEEvEESt8weak_ptrIS0_E",
-      "demangled": "std::__future_base::_State_baseV2::_M_set_delayed_result(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>, std::weak_ptr<std::__future_base::_State_baseV2>)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base13_State_baseV29_M_do_setEPSt8functionIFSt10unique_ptrINS_12_Result_baseENS3_8_DeleterEEvEEPb",
-      "demangled": "std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt13__future_base14_S_task_setterISt10unique_ptrINS_7_ResultIiEENS_12_Result_base8_DeleterEEZNS_11_Task_stateIPFiiESaIiES8_E14_M_run_delayedEOiSt8weak_ptrINS_13_State_baseV2EEEUlvE_EENS_12_Task_setterIT_T0_NSI_12element_type11result_typeEEERSI_RSJ_",
-      "demangled": "std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>::element_type::result_type> std::__future_base::_S_task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'()>(std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>&, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'()&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE15_M_init_functorISJ_EEvRSt9_Any_dataOT_",
-      "demangled": "void std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_init_functor<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::_Any_data&, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE21_M_not_empty_functionISJ_EEbRKT_",
-      "demangled": "bool std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_not_empty_function<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int> const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt14_Function_base13_Base_managerINSt13__future_base12_Task_setterISt10unique_ptrINS1_7_ResultIiEENS1_12_Result_base8_DeleterEEZNS1_11_Task_stateIPFiiESaIiESA_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEE9_M_createISJ_EEvRSt9_Any_dataOT_St17integral_constantIbLb1EE",
-      "demangled": "void std::_Function_base::_Base_manager<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>::_M_create<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>>(std::_Any_data&, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&, std::integral_constant<bool, true>)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt15__uniq_ptr_dataINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_ELb1ELb1EECI2St15__uniq_ptr_implIS2_S4_EEPS2_",
-      "demangled": "std::__uniq_ptr_data<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>, true, true>::__uniq_ptr_data(std::__future_base::_State_baseV2::_Make_ready*)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE10_M_deleterEv",
-      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_deleter()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE6_M_ptrEv",
-      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::_M_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EE7releaseEv",
-      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::release()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt15__uniq_ptr_implINSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEC2EPS2_",
-      "demangled": "std::__uniq_ptr_impl<std::__future_base::_State_baseV2::_Make_ready, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::__uniq_ptr_impl(std::__future_base::_State_baseV2::_Make_ready*)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE15_M_weak_releaseEv",
-      "demangled": "std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_weak_release()",
       "file": null,
       "line": null
     },
@@ -9192,180 +9516,6 @@
     {
       "mangled": "_ZNSt23_Sp_counted_ptr_inplaceINSt13__future_base17_Async_state_implINSt6thread8_InvokerISt5tupleIJPFiiEiEEEEiEESaIvELN9__gnu_cxx12_Lock_policyE2EE14_M_get_deleterERKSt9type_info",
       "demangled": "std::_Sp_counted_ptr_inplace<std::__future_base::_Async_state_impl<std::thread::_Invoker<std::tuple<int (*)(int), int>>, int>, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt5tupleIJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEEC2EvQfraa26is_default_constructible_vIT_E",
-      "demangled": "std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>::tuple() requires ((is_default_constructible_v<T>...) && ...)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt6thread24_M_thread_deps_never_runEv",
-      "demangled": "std::thread::_M_thread_deps_never_run()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt8functionIFSt10unique_ptrINSt13__future_base12_Result_baseENS2_8_DeleterEEvEEC2INS1_12_Task_setterIS0_INS1_7_ResultIiEES3_EZNS1_11_Task_stateIPFiiESaIiESD_E14_M_run_delayedEOiSt8weak_ptrINS1_13_State_baseV2EEEUlvE_iEEvEEOT_",
-      "demangled": "std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::function<std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>, void>(std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<int>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_state<int (*)(int), std::allocator<int>, int (int)>::_M_run_delayed(int&&, std::weak_ptr<std::__future_base::_State_baseV2>)::'lambda'(), int>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEC2EOS2_",
-      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::weak_ptr(std::weak_ptr<std::__future_base::_State_baseV2>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEC2Ev",
-      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::weak_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EED2Ev",
-      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::~weak_ptr()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZNSt8weak_ptrINSt13__future_base13_State_baseV2EEaSEOS2_",
-      "demangled": "std::weak_ptr<std::__future_base::_State_baseV2>::operator=(std::weak_ptr<std::__future_base::_State_baseV2>&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt12__get_helperILm0EPNSt13__future_base13_State_baseV211_Make_readyEJSt14default_deleteIS2_EEERKT0_RKSt11_Tuple_implIXT_EJS6_DpT1_EE",
-      "demangled": "std::__future_base::_State_baseV2::_Make_ready* const& std::__get_helper<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt12__get_helperILm0EPNSt13__future_base13_State_baseV211_Make_readyEJSt14default_deleteIS2_EEERT0_RSt11_Tuple_implIXT_EJS6_DpT1_EE",
-      "demangled": "std::__future_base::_State_baseV2::_Make_ready*& std::__get_helper<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt12__get_helperILm1ESt14default_deleteINSt13__future_base13_State_baseV211_Make_readyEEJEERT0_RSt11_Tuple_implIXT_EJS5_DpT1_EE",
-      "demangled": "std::default_delete<std::__future_base::_State_baseV2::_Make_ready>& std::__get_helper<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::_Tuple_impl<1ul, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt13__invoke_implIvMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEPS1_JS9_SA_EET_St21__invoke_memfun_derefOT0_OT1_DpOT2_",
-      "demangled": "void std::__invoke_impl<void, void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::__invoke_memfun_deref, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt13__invoke_implIvMSt6threadFvvEPS0_JEET_St21__invoke_memfun_derefOT0_OT1_DpOT2_",
-      "demangled": "void std::__invoke_impl<void, void (std::thread::*)(), std::thread*>(std::__invoke_memfun_deref, void (std::thread::*&&)(), std::thread*&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt13__invoke_implIvZL21atexit_callback_entryR11fuzz_streamE3$_0JEET_St14__invoke_otherOT0_DpOT1_",
-      "demangled": "void std::__invoke_impl<void, atexit_callback_entry(fuzz_stream&)::$_0>(std::__invoke_other, atexit_callback_entry(fuzz_stream&)::$_0&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt3getILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERKNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERKSA_",
-      "demangled": "std::tuple_element<0ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type const& std::get<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>> const&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt3getILm0EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERSA_",
-      "demangled": "std::tuple_element<0ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type& std::get<0ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt3getILm1EJPNSt13__future_base13_State_baseV211_Make_readyESt14default_deleteIS2_EEERNSt13tuple_elementIXT_ESt5tupleIJDpT0_EEE4typeERSA_",
-      "demangled": "std::tuple_element<1ul, std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>>::type& std::get<1ul, std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>(std::tuple<std::__future_base::_State_baseV2::_Make_ready*, std::default_delete<std::__future_base::_State_baseV2::_Make_ready>>&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt8__invokeIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEJPS1_S9_SA_EENSt15__invoke_resultIT_JDpT0_EE4typeEOSF_DpOSG_",
-      "demangled": "std::__invoke_result<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>::type std::__invoke<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt8__invokeIMSt6threadFvvEJPS0_EENSt15__invoke_resultIT_JDpT0_EE4typeEOS5_DpOS6_",
-      "demangled": "std::__invoke_result<void (std::thread::*)(), std::thread*>::type std::__invoke<void (std::thread::*)(), std::thread*>(void (std::thread::*&&)(), std::thread*&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZSt8__invokeIZL21atexit_callback_entryR11fuzz_streamE3$_0JEENSt15__invoke_resultIT_JDpT0_EE4typeEOS4_DpOS5_",
-      "demangled": "std::__invoke_result<atexit_callback_entry(fuzz_stream&)::$_0>::type std::__invoke<atexit_callback_entry(fuzz_stream&)::$_0>(atexit_callback_entry(fuzz_stream&)::$_0&&)",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZL21atexit_callback_entryR11fuzz_streamENK3$_0clEv",
-      "demangled": "atexit_callback_entry(fuzz_stream&)::$_0::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS3_12_Result_baseENS7_8_DeleterEEvEEPbEJPS4_SC_SD_EEvRS_OT_DpOT0_EUlvE_EERSI_ENKUlvE_clEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::'lambda'()::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS3_12_Result_baseENS7_8_DeleterEEvEEPbEJPS4_SC_SD_EEvRS_OT_DpOT0_EUlvE_EERSI_ENUlvE_8__invokeEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::'lambda'()::__invoke()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMSt6threadFvvEJPS3_EEvRS_OT_DpOT0_EUlvE_EERS8_ENKUlvE_clEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()>(void (std::thread::*&)())::'lambda'()::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIMSt6threadFvvEJPS3_EEvRS_OT_DpOT0_EUlvE_EERS8_ENUlvE_8__invokeEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()>(void (std::thread::*&)())::'lambda'()::__invoke()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRS_OT_DpOT0_EUlvE_EERS7_ENKUlvE_clEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()>(atexit_callback_entry(fuzz_stream&)::$_0&)::'lambda'()::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZNSt9once_flag18_Prepare_executionC1IZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRS_OT_DpOT0_EUlvE_EERS7_ENUlvE_8__invokeEv",
-      "demangled": "std::once_flag::_Prepare_execution::_Prepare_execution<void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()>(atexit_callback_entry(fuzz_stream&)::$_0&)::'lambda'()::__invoke()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZSt9call_onceIMNSt13__future_base13_State_baseV2EFvPSt8functionIFSt10unique_ptrINS0_12_Result_baseENS4_8_DeleterEEvEEPbEJPS1_S9_SA_EEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
-      "demangled": "void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::'lambda'()::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZSt9call_onceIMSt6threadFvvEJPS0_EEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
-      "demangled": "void std::call_once<void (std::thread::*)(), std::thread*>(std::once_flag&, void (std::thread::*&&)(), std::thread*&&)::'lambda'()::operator()() const",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZZSt9call_onceIZL21atexit_callback_entryR11fuzz_streamE3$_0JEEvRSt9once_flagOT_DpOT0_ENKUlvE_clEv",
-      "demangled": "void std::call_once<atexit_callback_entry(fuzz_stream&)::$_0>(std::once_flag&, atexit_callback_entry(fuzz_stream&)::$_0&&)::'lambda'()::operator()() const",
       "file": null,
       "line": null
     },

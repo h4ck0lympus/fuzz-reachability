@@ -8,9 +8,9 @@
 #   make matrix                # LLVM 21/22/23(+) compatibility matrix
 #   make clean
 
-# Default LLVM major: the smallest installed llvm-config (>= 21) whose FULL
-# version can read rustc's bitcode (see scripts/select_llvm.sh). Override with
-# e.g. `make build LLVM_MAJOR=23`.
+# Default LLVM major: 21 if an llvm-config-21 is installed, otherwise the newest
+# installed major above it (see scripts/select_llvm.sh). Override with e.g.
+# `make build LLVM_MAJOR=23`.
 LLVM_MAJOR  ?= $(shell bash $(CURDIR)/scripts/select_llvm.sh)
 LLVM_CONFIG ?= llvm-config-$(LLVM_MAJOR)
 
@@ -58,5 +58,4 @@ matrix: ## build + test against every installed llvm-config-NN (NN >= 21)
 clean: ## remove analyzer build outputs
 	$(MAKE) -C analyzer clean BUILD=build
 	$(MAKE) -C analyzer clean BUILD=build-svf
-	rm -rf analyzer/build/21 analyzer/build/22 analyzer/build/23 \
-	       analyzer/build/21-svf analyzer/build/22-svf analyzer/build/23-svf
+	rm -rf analyzer/build/2[0-9] analyzer/build/2[0-9]-svf
