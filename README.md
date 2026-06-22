@@ -97,7 +97,8 @@ reachability run --lang <target> --project <dir> [--out <file>]
 ```
 
 `--out` is optional; it defaults to `reachability.json` in the `--project`
-directory.
+directory. If `--out` points at an existing directory, the report is written
+to `reachability.json` inside it.
 
 `<target>` is a source language (`c`, `cpp`, `rust`, `mixed`) or a Rust fuzz
 harness (`libfuzzer`, `ziggy`, `afl`). Each sets a default entry point, so the
@@ -227,7 +228,7 @@ entry point(s).
 |--------|---------|---------|
 | `--project DIR` | *(required)* | Project directory to build and analyze. |
 | `--lang TARGET` | *(required)* | Target type (see the table below): sets how bitcode is acquired and the default entry. |
-| `--out FILE` | `reachability.json` in `--project` | Path for the JSON report. The two sancov lists default to `reached.txt` / `not_reached.txt` beside it. |
+| `--out FILE` | `reachability.json` in `--project` | Path for the JSON report. A directory writes `reachability.json` into it. The two sancov lists default to `reached.txt` / `not_reached.txt` beside it. |
 | `--entry NAME` | per `--lang` | Entry to root reachability at. **Repeatable**; overrides the target default. See [Entry resolution](#entry-resolution). |
 | `--backend {type-based,svf}` | `type-based` | Indirect-call resolution backend. `svf` needs an SVF-enabled analyzer: run `make build-svf` and `--backend=svf` picks up `analyzer/build-svf/reachability-analyzer` automatically (override with `$REACHABILITY_ANALYZER_SVF`). |
 | `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive to extract bitcode from (relative to `--project`). Auto-detected otherwise, preferring an executable over a shared library, archive, then object. |

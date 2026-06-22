@@ -82,6 +82,8 @@ def cmd_run(args):
     v = args.verbose
     if args.out is None:
         args.out = os.path.join(args.project, "reachability.json")
+    elif os.path.isdir(args.out):
+        args.out = os.path.join(args.out, "reachability.json")
     tc = toolchain.check_coherence(default_analyzer(args.backend))
     if v:
         print(f"==> [1/4] toolchain: LLVM {tc.llvm_major} (rustc LLVM {tc.rustc_major})")
@@ -178,7 +180,9 @@ def build_parser():
     r.add_argument("--not-reached", default=None, dest="not_reached",
                    help="sancov ignorelist path (default: not_reached.txt next to --out)")
     r.add_argument("--out", default=None,
-                   help="output JSON path (default: reachability.json in --project)")
+                   help="output JSON path, or a directory to write "
+                        "reachability.json into (default: reachability.json "
+                        "in --project)")
     r.add_argument("-v", "--verbose", action="store_true",
                    help="narrate each pipeline stage (toolchain, build, merge, "
                         "analyze): echo the tool commands, stream the build "
