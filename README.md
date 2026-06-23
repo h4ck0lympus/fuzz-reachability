@@ -238,8 +238,8 @@ entry point(s).
 | `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive to extract bitcode from (relative to `--project`). Auto-detected otherwise, preferring an executable over a shared library, archive, then object. |
 | `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with `gllvm` injected. E.g. `"cmake -S . -B build && cmake --build build"`. Auto-detected from the project files otherwise (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, else `make`). |
 | `--static-libs {auto,none,all}` | `auto` | C/C++ only: how to treat static archives (`.a`) the target links. `auto` also analyzes each linked archive in full, so members the linker dropped are reported rather than silently absent. `none` keeps only the linker's view. `all` includes every bitcode archive in the tree, skipping any whose members another archive already covers and resolving residual overlaps at link time (`llvm-link --override`). |
-| `--profile {debug,release}` | `debug` | Rust only: cargo profile for the bitcode build. Match the fuzz binary's profile — opt level decides generic sharing, so a mismatch emits a different set of monomorphizations than the instrumented binary. |
-| `--codegen-units N` | `1` | Rust only: `-Ccodegen-units` for the bitcode build. Match the fuzz binary's value — it decides inlining, hence which functions are emitted as standalone symbols. |
+| `--profile {debug,release}` | `debug` | Rust only: cargo profile for the bitcode build. Match the fuzz binary's profile. See [Matching the fuzz binary's build](#matching-the-fuzz-binarys-build). |
+| `--codegen-units N` | `1` | Rust only: rustc `-Ccodegen-units` for the bitcode build (positive integer). Match the fuzz binary's value. See [Matching the fuzz binary's build](#matching-the-fuzz-binarys-build). |
 | `--build-std` | off | Rust only: build the standard library from source (`-Zbuild-std`) so std functions appear in the graph instead of as external declarations. |
 | `--dot FILE` | *(none)* | Also write the reachable subgraph as Graphviz DOT (indirect edges dashed/red). |
 | `--reached FILE` | beside `--out` | Path for the sancov **allowlist** of reachable functions. |
@@ -275,6 +275,48 @@ of:
 Matching more than one function only adds roots, which stays sound. For a Rust
 binary, just root at `main`: the token matches the real Rust `main`, so you never
 need to type a mangled symbol.
+
+#### Matching the fuzz binary's build
+
+For Rust targets the driver builds its own bitcode (`cargo build --emit=llvm-bc`)
+and computes reachability from that. For the resulting `reached.txt` /
+`not_reached.txt` to line up with the binary you actually instrument, that
+bitcode build should match the fuzz binary's build. Two Rust-only options control
+this; both default to the most common fuzzer setup and are ignored for C/C++.
+
+- **`--profile {debug,release}`** (default `debug`) — the cargo profile. The
+  optimization level drives generic *sharing* (rustc's `-Zshare-generics` is on
+  when unoptimized, off when optimized): it decides which crate instantiates each
+  generic, and so which monomorphizations exist and how they are mangled. A
+  debug snapshot against a release fuzz binary (or vice versa) therefore produces
+  a different function set. Pass `--profile release` for an optimized fuzz build.
+
+- **`--codegen-units N`** (default `1`) — passed through verbatim as rustc
+  `-Ccodegen-units`. The unit count sets inlining boundaries, hence which
+  monomorphizations survive as standalone functions rather than being inlined
+  away. `N` is any **positive integer** (rustc rejects `0`/negative). Useful
+  values:
+  - **`1`** — a single unit per crate: maximum inlining and exactly one `.bc` per
+    crate. Many fuzzing profiles pin `codegen-units = 1` for better optimization,
+    so the default already matches them.
+  - **`16`** — the rustc default for a cargo **release** build (incremental off).
+  - **`256`** — the rustc default for a cargo **dev/debug** build (incremental on).
+
+  With `N` > 1 rustc splits each crate into several
+  `target/<profile>/deps/<crate>-<hash>.<cgu>.rcgu.bc` files; the driver collects
+  all of them.
+
+**How to choose.** Use whatever your fuzz build uses. That is the cargo/rustc
+default for its profile (release → 16, dev → 256) unless a `[profile.*]
+codegen-units` in `Cargo.toml` or a `-Ccodegen-units` in `RUSTFLAGS` overrides
+it. If unsure, build the fuzz target with `codegen-units = 1` and keep the
+defaults here — the two then agree.
+
+The `fun:` patterns in the lists already tolerate the Rust mangling
+*disambiguator* (`17h<hash>`) drifting between builds (see [Output](#output)), but
+that only covers the *naming* of a given instance. Matching `--profile` /
+`--codegen-units` is what aligns the *set* of emitted functions; a wildcard
+cannot recover a function that one build inlined away and the other did not.
 
 #### Environment variables
 
