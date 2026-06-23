@@ -178,10 +178,7 @@ entirely; now they are correctly reported as defined-but-unreachable.
 > is unreachable, yet the XPath axis callbacks (`xmlXPathNextAncestor`, …) are
 > reported reachable `via indirect`: they are address-taken and their type
 > matches an indirect call site the parser reaches. This is the sound-leaning
-> bias at work — never miss a real edge, even at the cost of some false ones. A
-> more precise backend (`--backend=svf`) narrows callsites whose pointers it
-> tracks precisely; callbacks that escape into memory (stored in a struct field
-> or a dispatch table) are kept by both backends so a real edge is never lost.
+> bias at work — never miss a real edge, even at the cost of some false ones.
 
 ### Step 5 — Instrument only reachable code
 

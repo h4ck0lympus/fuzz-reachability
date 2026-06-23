@@ -21,7 +21,7 @@ Additionally you can feed the output files into [cov-analysis](github.com/AFLplu
 
 **Deep dives:**
 - Worked examples, step by step — a generic `LLVMFuzzerTestOneInput` harness for AFL++/libfuzzer (libxml2), a ziggy harness (the `url` crate), and cargo-afl harnesses (cpp_demangle and rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
-- LLVM version support and the SVF fallback plan — [`docs/llvm-support.md`](docs/llvm-support.md)
+- LLVM version support — [`docs/llvm-support.md`](docs/llvm-support.md)
 
 
 Author: Marc "vanHauser" Heuse
@@ -61,6 +61,8 @@ Two components, joined by merged bitcode:
   https://apt.llvm.org/llvm.sh instead of the distribution, as those will be outdated!
 - **Go** (to install `gllvm`), **Python ≥ 3.12**, and a **C++17** compiler. Rust
   targets also need **rustc / cargo** (nightly, but one using LLVM 21 or prior).
+- [AFL++](https://github.com/AFLplusplus/AFLplusplus) compiled from commit 3d091ef190e413571dd2a3f94c896a9118ca6731 onwards (22 June 2026)
+- [cov-analysis](https://github.com/AFLplusplus/cov-analysis) from commit 72c239038430477181df99f7a2cd0a556f2701dd onwards (23 June 2026)
 
 ## Install
 
@@ -230,7 +232,7 @@ entry point(s).
 | `--lang TARGET` | *(required)* | Target type (see the table below): sets how bitcode is acquired and the default entry. |
 | `--out FILE` | `reachability.json` in `--project` | Path for the JSON report. A directory writes `reachability.json` into it. The two sancov lists default to `reached.txt` / `not_reached.txt` beside it. |
 | `--entry NAME` | per `--lang` | Entry to root reachability at. **Repeatable**; overrides the target default. See [Entry resolution](#entry-resolution). |
-| `--backend {type-based,svf}` | `type-based` | Indirect-call resolution backend. `svf` needs an SVF-enabled analyzer: run `make build-svf` and `--backend=svf` picks up `analyzer/build-svf/reachability-analyzer` automatically (override with `$REACHABILITY_ANALYZER_SVF`). |
+| `--backend NAME` | *(none)* | Deprecated and ignored; the type-based backend is always used. Accepted for backward compatibility — passing it prints a warning. |
 | `--artifact PATH` | auto-detect | C/C++ only: the built binary/object/archive to extract bitcode from (relative to `--project`). Auto-detected otherwise, preferring an executable over a shared library, archive, then object. |
 | `--build-cmd CMD` | auto-detect | C/C++ only: shell build command, run with `gllvm` injected. E.g. `"cmake -S . -B build && cmake --build build"`. Auto-detected from the project files otherwise (`configure` → `Makefile` → `CMakeLists.txt` → `build.ninja` → `meson.build`, else `make`). |
 | `--static-libs {auto,none,all}` | `auto` | C/C++ only: how to treat static archives (`.a`) the target links. `auto` also analyzes each linked archive in full, so members the linker dropped are reported rather than silently absent. `none` keeps only the linker's view. `all` includes every bitcode archive in the tree, skipping any whose members another archive already covers and resolving residual overlaps at link time (`llvm-link --override`). |
@@ -275,7 +277,6 @@ need to type a mangled symbol.
 | Variable | Purpose |
 |----------|---------|
 | `REACHABILITY_ANALYZER` | Path to the analyzer binary (default `analyzer/build/reachability-analyzer`). |
-| `REACHABILITY_ANALYZER_SVF` | Path to an SVF-enabled analyzer (for `--backend=svf` and tests). |
 | `CLANG` / `CLANGXX` / `LLVM_LINK` / `OPT` | Override individual tool paths (otherwise resolved by major from the analyzer's LLVM). |
 | `PATH` | Must contain `gclang` / `gclang++` / `get-bc` (gllvm) for C/C++/mixed targets. |
 
@@ -307,27 +308,31 @@ clang -fsanitize-coverage=trace-pc-guard -fsanitize-coverage-ignorelist=not_reac
 > has no such requirement, so `not_reached.txt` is pure `fun:` lines. (Verified
 > against clang in `driver/tests/test_covlists.py`.)
 
-## Indirect-call backends
+## Indirect-call resolution
 
-| Backend | Flag | Notes |
-|---------|------|-------|
-| Type-based (default) | `--backend=type-based` | Buckets address-taken functions by LLVM function type. Language-agnostic, always available, sound. |
-| SVF Andersen points-to | `--backend=svf` | Higher precision: per-callsite points-to narrows the type-based over-approximation. Optional; built separately. Augments each callsite with the type-matched functions whose address escapes into memory (so it never misses a target SVF's points-to under-approximates, e.g. a callback stored into a struct field or global table), and falls back to the full type-based set for any callsite it cannot resolve. |
+Indirect calls (C function pointers, C++ virtual dispatch, Rust `dyn`/`fn`
+pointers) are resolved by the **type-based** resolver: an indirect call of
+function type `T` may reach any address-taken function whose LLVM function type
+is `T`. It is language-agnostic, always available, and sound — a deliberate
+over-approximation. The `--indirect-any` debug flag widens this further, to any
+address-taken function regardless of type.
 
-SVF currently builds against **LLVM 21 only**. On LLVM 22/23 the default
-type-based backend is fully functional, and `--backend=svf` returns a clear error
-rather than degrading silently. Build SVF with:
+See [`docs/llvm-support.md`](docs/llvm-support.md) for the LLVM compatibility
+matrix.
 
-```bash
-make build-svf      # builds the SVF dependency + an SVF-enabled analyzer (pins LLVM 21)
-```
+## Historical note: the removed SVF backend
 
-This writes `analyzer/build-svf/reachability-analyzer`; `--backend=svf` finds it
-automatically (no env var needed). Setting `$REACHABILITY_ANALYZER` selects the
-type-based binary only — the SVF binary is selected via `$REACHABILITY_ANALYZER_SVF`.
-
-See [`docs/llvm-support.md`](docs/llvm-support.md) for the compatibility matrix
-and the full fallback plan.
+Earlier versions shipped an optional second backend, `--backend=svf`, built on
+[SVF](https://github.com/SVF-tools/SVF)'s Andersen points-to analysis, meant to
+narrow the type-based over-approximation per call site. It was removed: in
+practice it produced essentially the same reachable sets as the default
+type-based backend while costing far more. It built only against a pinned LLVM
+21 (it failed on 22/23), required a separately vendored SVF + Z3 build with a
+local source patch, ran substantially slower, and was more fragile to operate —
+so it offered no practical benefit over the type-based backend, which is sound,
+language-agnostic, and works on every supported LLVM. The `--backend` flag is
+retained only for backward compatibility: it is accepted but ignored (with a
+warning).
 
 ## Testing
 
@@ -346,8 +351,8 @@ analyzer/   C++ analyzer + Makefile (src/, built via llvm-config)
 driver/     Python driver (toolchain, acquire_*, link, analyze, cli)
 fixtures/   per-language test targets with expected reachable sets
 examples/   worked examples (cpp_cmake/)
-scripts/    setup.sh, build_svf.sh, test_matrix.sh, select_llvm.sh
-docs/        worked examples (EXAMPLES.md), LLVM support, SVF notes
+scripts/    setup.sh, test_matrix.sh, select_llvm.sh
+docs/        worked examples (EXAMPLES.md), LLVM support
 ```
 
 ## Limitations

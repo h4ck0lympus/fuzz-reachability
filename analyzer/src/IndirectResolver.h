@@ -8,7 +8,7 @@
 namespace reach {
 
 // Pluggable backend for resolving indirect call targets. The type-based
-// resolver is the default; SVF is an optional drop-in (Milestone 5).
+// resolver is the default; AnyResolver (--indirect-any) is a debug variant.
 struct IndirectResolver {
   virtual ~IndirectResolver() = default;
   // Precompute over the whole module once before resolve() calls.

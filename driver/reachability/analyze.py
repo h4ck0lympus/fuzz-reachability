@@ -8,7 +8,7 @@ class AnalyzeError(RuntimeError):
     pass
 
 
-def analyze(merged_bc, tc, entries, backend="type-based", dot=None,
+def analyze(merged_bc, tc, entries, dot=None,
             indirect_any=False, reached_out=None, not_reached_out=None,
             verbose=False):
     """Run the analyzer on `merged_bc`; return the parsed JSON report.
@@ -16,7 +16,7 @@ def analyze(merged_bc, tc, entries, backend="type-based", dot=None,
     reached_out / not_reached_out: paths for the sancov allowlist / ignorelist.
     verbose: echo the exact analyzer command and pass its warnings through.
     """
-    cmd = [tc.analyzer, merged_bc, "--backend", backend]
+    cmd = [tc.analyzer, merged_bc]
     for e in entries:
         cmd += ["--entry", e]
     if indirect_any:

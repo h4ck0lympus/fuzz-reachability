@@ -1,14 +1,14 @@
 {
   "llvm_version": "21",
-  "backend": "svf",
+  "backend": "type-based",
   "entries": [
     "LLVMFuzzerTestOneInput"
   ],
   "summary": {
-    "defined": 1196,
+    "defined": 1195,
     "reachable": 1178,
     "indirect_only": 112,
-    "unreachable": 18
+    "unreachable": 17
   },
   "reachable": [
     {
@@ -9524,12 +9524,6 @@
     {
       "mangled": "__cxx_global_var_init",
       "demangled": "__cxx_global_var_init",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "bsearch",
-      "demangled": "bsearch",
       "file": null,
       "line": null
     },

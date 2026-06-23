@@ -10,45 +10,23 @@ from reachability import cli, toolchain
 HAVE_GLLVM = shutil.which("gclang") is not None
 
 
-def test_default_analyzer_default_paths(monkeypatch):
+def test_default_analyzer_default_path(monkeypatch):
     monkeypatch.delenv("REACHABILITY_ANALYZER", raising=False)
-    monkeypatch.delenv("REACHABILITY_ANALYZER_SVF", raising=False)
     monkeypatch.setattr(os.path, "isfile", lambda p: True)
     typed = os.path.join("analyzer", "build", "reachability-analyzer")
-    svf = os.path.join("analyzer", "build-svf", "reachability-analyzer")
     assert cli.default_analyzer().endswith(typed)
-    assert cli.default_analyzer("type-based").endswith(typed)
-    assert cli.default_analyzer("svf").endswith(svf)
 
 
-def test_default_analyzer_env_overrides(monkeypatch, tmp_path):
+def test_default_analyzer_env_override(monkeypatch, tmp_path):
     typed = tmp_path / "typed"; typed.write_text("")
-    svf = tmp_path / "svf"; svf.write_text("")
     monkeypatch.setenv("REACHABILITY_ANALYZER", str(typed))
-    monkeypatch.setenv("REACHABILITY_ANALYZER_SVF", str(svf))
     assert cli.default_analyzer() == str(typed)
-    assert cli.default_analyzer("type-based") == str(typed)
-    assert cli.default_analyzer("svf") == str(svf)
-
-
-def test_default_analyzer_svf_ignores_type_based_env(monkeypatch, tmp_path):
-    typed = tmp_path / "typed"; typed.write_text("")
-    monkeypatch.setenv("REACHABILITY_ANALYZER", str(typed))
-    monkeypatch.delenv("REACHABILITY_ANALYZER_SVF", raising=False)
-    monkeypatch.setattr(os.path, "isfile", lambda p: True)
-    assert cli.default_analyzer("svf").endswith(
-        os.path.join("analyzer", "build-svf", "reachability-analyzer")
-    )
 
 
 def test_default_analyzer_missing_binary_errors(monkeypatch):
     monkeypatch.setenv("REACHABILITY_ANALYZER", "/no/such/analyzer")
     with pytest.raises(toolchain.ToolchainError):
         cli.default_analyzer()
-    monkeypatch.setenv("REACHABILITY_ANALYZER_SVF", "/no/such/svf-analyzer")
-    with pytest.raises(toolchain.ToolchainError) as excinfo:
-        cli.default_analyzer("svf")
-    assert "build-svf" in str(excinfo.value)
 
 
 def test_target_entry_defaults():
@@ -98,6 +76,23 @@ def test_out_directory_names_json(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError):
         cli.cmd_run(args)
     assert args.out == os.path.join(str(outdir), "reachability.json")
+
+
+def test_backend_flag_deprecated_warns(monkeypatch, capsys):
+    p = cli.build_parser()
+    args = p.parse_args(
+        ["run", "--project", "x", "--lang", "c", "--out", "o", "--backend", "svf"]
+    )
+    monkeypatch.setattr(cli.toolchain, "check_coherence", lambda *a, **k: None)
+    monkeypatch.setattr(cli, "default_analyzer", lambda *a, **k: "analyzer")
+
+    def boom(*a, **k):
+        raise RuntimeError("stop after the deprecation warning")
+
+    monkeypatch.setattr(cli, "_acquire", boom)
+    with pytest.raises(RuntimeError):
+        cli.cmd_run(args)
+    assert "deprecated and ignored" in capsys.readouterr().err
 
 
 def test_check_toolchain_ok(analyzer, monkeypatch):

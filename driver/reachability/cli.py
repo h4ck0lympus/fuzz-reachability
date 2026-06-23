@@ -31,17 +31,11 @@ TARGETS = {
 }
 
 
-def default_analyzer(backend="type-based"):
+def default_analyzer():
     repo = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    if backend == "svf":
-        path = os.environ.get("REACHABILITY_ANALYZER_SVF") or os.path.join(
-            repo, "analyzer", "build-svf", "reachability-analyzer")
-        hint = ("build it with `make build-svf`, or set $REACHABILITY_ANALYZER_SVF "
-                "to an SVF-enabled analyzer")
-    else:
-        path = os.environ.get("REACHABILITY_ANALYZER") or os.path.join(
-            repo, "analyzer", "build", "reachability-analyzer")
-        hint = "build it with `make build`, or set $REACHABILITY_ANALYZER"
+    path = os.environ.get("REACHABILITY_ANALYZER") or os.path.join(
+        repo, "analyzer", "build", "reachability-analyzer")
+    hint = "build it with `make build`, or set $REACHABILITY_ANALYZER"
     if not os.path.isfile(path):
         raise toolchain.ToolchainError(f"analyzer binary not found: {path}\n{hint}")
     return path
@@ -80,11 +74,14 @@ def _acquire(args, tc, verbose=False):
 
 def cmd_run(args):
     v = args.verbose
+    if args.backend is not None:
+        print("warning: --backend is deprecated and ignored; the type-based "
+              "backend is always used", file=sys.stderr)
     if args.out is None:
         args.out = os.path.join(args.project, "reachability.json")
     elif os.path.isdir(args.out):
         args.out = os.path.join(args.out, "reachability.json")
-    tc = toolchain.check_coherence(default_analyzer(args.backend))
+    tc = toolchain.check_coherence(default_analyzer())
     if v:
         print(f"==> [1/4] toolchain: LLVM {tc.llvm_major} (rustc LLVM {tc.rustc_major})")
         print(f"  clang     {tc.clang}")
@@ -113,10 +110,9 @@ def cmd_run(args):
     reached = args.reached or os.path.join(outdir, "reached.txt")
     not_reached = args.not_reached or os.path.join(outdir, "not_reached.txt")
     if v:
-        print(f"==> [4/4] analyzing from entries [{', '.join(args.entry)}] "
-              f"with backend={args.backend}")
+        print(f"==> [4/4] analyzing from entries [{', '.join(args.entry)}]")
     result = analyze.analyze(
-        merged, tc, args.entry, backend=args.backend, dot=args.dot,
+        merged, tc, args.entry, dot=args.dot,
         reached_out=reached, not_reached_out=not_reached, verbose=v,
     )
     with open(args.out, "w") as fh:
@@ -172,7 +168,9 @@ def build_parser():
                    help="entry function (repeatable; overrides the --lang default). "
                         "Accepts a mangled symbol, a demangled name, a '::name' "
                         "suffix like 'main', or the alias 'fuzz_target!'")
-    r.add_argument("--backend", default="type-based", choices=["type-based", "svf"])
+    r.add_argument("--backend", default=None,
+                   help="deprecated and ignored; the type-based backend is "
+                        "always used")
     r.add_argument("--build-std", action="store_true", dest="build_std")
     r.add_argument("--dot", default=None)
     r.add_argument("--reached", default=None,
