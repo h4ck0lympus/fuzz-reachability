@@ -61,7 +61,7 @@ Two components, joined by merged bitcode:
   https://apt.llvm.org/llvm.sh instead of the distribution, as those will be outdated!
 - **Go** (to install `gllvm`), **Python ≥ 3.12**, and a **C++17** compiler. Rust
   targets also need **rustc / cargo** (nightly, but one using LLVM 21 or prior).
-- [AFL++](https://github.com/AFLplusplus/AFLplusplus) compiled from commit 3d091ef190e413571dd2a3f94c896a9118ca6731 onwards (22 June 2026)
+- [AFL++](https://github.com/AFLplusplus/AFLplusplus) compiled from commit 01a83a3d7098e605f0c7fd69381fcf4fc97144fe onwards (24 June 2026)
 - [cov-analysis](https://github.com/AFLplusplus/cov-analysis) from commit 72c239038430477181df99f7a2cd0a556f2701dd onwards (23 June 2026)
 
 ## Install
