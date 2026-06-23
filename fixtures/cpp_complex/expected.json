@@ -1,14 +1,14 @@
 {
   "llvm_version": "21",
-  "backend": "svf",
+  "backend": "type-based",
   "entries": [
     "LLVMFuzzerTestOneInput"
   ],
   "summary": {
     "defined": 199,
-    "reachable": 186,
-    "indirect_only": 55,
-    "unreachable": 13
+    "reachable": 188,
+    "indirect_only": 57,
+    "unreachable": 11
   },
   "reachable": [
     {
@@ -248,7 +248,7 @@
       "demangled": "CovDerived::cov_clone()",
       "file": null,
       "line": null,
-      "via": "direct",
+      "via": "both",
       "indirect_only": false
     },
     {
@@ -508,6 +508,14 @@
       "indirect_only": false
     },
     {
+      "mangled": "_ZN23redherrings_UninstShape4areaEv",
+      "demangled": "redherrings_UninstShape::area()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
+    },
+    {
       "mangled": "_ZN23redherrings_UninstShape8describeEv",
       "demangled": "redherrings_UninstShape::describe()",
       "file": null,
@@ -562,6 +570,14 @@
       "line": null,
       "via": "both",
       "indirect_only": false
+    },
+    {
+      "mangled": "_ZN7CovBase9cov_cloneEv",
+      "demangled": "CovBase::cov_clone()",
+      "file": null,
+      "line": null,
+      "via": "indirect",
+      "indirect_only": true
     },
     {
       "mangled": "_ZN7CovBaseC2Ev",
@@ -1546,18 +1562,6 @@
     {
       "mangled": "_ZN15StaticInitProbeC2Ev",
       "demangled": "StaticInitProbe::StaticInitProbe()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZN23redherrings_UninstShape4areaEv",
-      "demangled": "redherrings_UninstShape::area()",
-      "file": null,
-      "line": null
-    },
-    {
-      "mangled": "_ZN7CovBase9cov_cloneEv",
-      "demangled": "CovBase::cov_clone()",
       "file": null,
       "line": null
     },

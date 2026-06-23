@@ -1,13 +1,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Mirrors libtiff's codec dispatch closely enough to trip SVF's points-to:
- * a struct with many same-typed function-pointer fields whose defaults are set
- * by one function and overridden by codec init functions reached through a
- * global table (plus a dynamic, registered linked list). The override stores a
- * function address into a field that is later called indirectly. SVF loses the
- * store->load connection across these layers and drops the real target; the
- * memory-escape set recovers it so the SVF backend stays sound. */
+/* Mirrors libtiff's codec dispatch: a struct with many same-typed
+ * function-pointer fields whose defaults are set by one function and overridden
+ * by codec init functions reached through a global table (plus a dynamic,
+ * registered linked list). The override stores a function address into a field
+ * that is later called indirectly. Exercises soundness of indirect-call
+ * resolution across the store->load connection these layers introduce. */
 
 typedef struct Obj Obj;
 typedef int (*method)(Obj *);

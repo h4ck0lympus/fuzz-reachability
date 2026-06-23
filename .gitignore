@@ -1,6 +1,5 @@
 # build artifacts
 analyzer/build/
-analyzer/build-svf/
 **/*.bc
 **/*.o
 **/target/
@@ -13,7 +12,6 @@ fixtures/**/build/
 fixtures/**/prog
 fixtures/**/merged.bc
 .venv/
-third_party/
 compile_commands.json
 not_reached.txt
 reached.txt

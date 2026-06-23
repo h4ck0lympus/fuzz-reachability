@@ -5,7 +5,6 @@
 #include "JsonReport.h"
 #include "Module.h"
 #include "Reachability.h"
-#include "SVFResolver.h"
 #include "Toolchain.h"
 #include "TypeBasedResolver.h"
 
@@ -30,7 +29,8 @@ static cl::list<std::string> EntryList("entry",
                                                 "'::name' suffix (e.g. 'main'), or the "
                                                 "alias 'fuzz_target!'."));
 static cl::opt<std::string> Backend("backend", cl::init("type-based"),
-                                    cl::desc("indirect-call backend: type-based|svf"));
+                                    cl::desc("deprecated and ignored; the type-based "
+                                             "backend is always used"));
 static cl::opt<bool> IndirectAny("indirect-any",
                                  cl::desc("indirect call may reach ANY address-taken "
                                           "function (debug, maximal over-approx)"));
@@ -153,16 +153,9 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if (Backend == "svf") {
-#ifndef REACHABILITY_ENABLE_SVF
-    errs() << "error: SVF backend not available (built without "
-              "REACHABILITY_ENABLE_SVF)\n";
-    return 2;
-#endif
-  } else if (Backend != "type-based") {
-    errs() << "error: unknown backend '" << Backend << "'\n";
-    return 2;
-  }
+  if (Backend.getNumOccurrences() > 0)
+    errs() << "warning: --backend is deprecated and ignored; using the "
+              "type-based backend\n";
 
   if (InputIR.empty()) {
     errs() << "error: no input .ll/.bc file given\n";
@@ -185,25 +178,13 @@ int main(int argc, char **argv) {
 
   reach::CallGraph graph;
   reach::buildDirectEdges(*mod, graph);
-  // Must run before the resolver's prepare(): SVF's buildSVFModule() links
-  // extapi and gives external functions (e.g. bsearch) stub bodies, which would
-  // hide their escaping callback arguments from buildEscapeEdges.
   reach::buildEscapeEdges(*mod, graph);
 
   std::unique_ptr<reach::IndirectResolver> resolver;
-  if (IndirectAny) {
+  if (IndirectAny)
     resolver = std::make_unique<reach::AnyResolver>();
-  } else if (Backend == "svf") {
-#ifdef REACHABILITY_ENABLE_SVF
-    resolver = std::make_unique<reach::SVFResolver>();
-#else
-    errs() << "error: SVF backend not available (built without "
-              "REACHABILITY_ENABLE_SVF)\n";
-    return 2;
-#endif
-  } else {
+  else
     resolver = std::make_unique<reach::TypeBasedResolver>();
-  }
   reach::buildIndirectEdges(*mod, graph, *resolver);
 
   if (DumpEdges) {
@@ -256,7 +237,7 @@ int main(int argc, char **argv) {
                  [&](raw_ostream &o) { reach::writeIgnorelist(o, *mod, res); }))
     return 1;
 
-  const char *backendName = IndirectAny ? "indirect-any" : Backend.c_str();
+  const char *backendName = IndirectAny ? "indirect-any" : "type-based";
   if (OutFile.empty()) {
     reach::writeJson(outs(), *mod, graph, res, backendName, entries);
   } else {

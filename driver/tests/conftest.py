@@ -18,14 +18,6 @@ def analyzer():
     return path
 
 
-@pytest.fixture(scope="session")
-def svf_analyzer():
-    path = os.environ.get("REACHABILITY_ANALYZER_SVF")
-    if not path or not os.path.exists(path):
-        pytest.skip("SVF analyzer not built (set REACHABILITY_ANALYZER_SVF)")
-    return path
-
-
 @pytest.fixture
 def run_analyzer(analyzer):
     def _run(args):

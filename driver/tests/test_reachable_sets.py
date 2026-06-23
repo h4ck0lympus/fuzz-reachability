@@ -127,35 +127,3 @@ def test_rust_only_entry_rooting(analyzer, tmp_path):
     )
     names = {f["demangled"] for f in result["reachable"]}
     assert any("parse" in n for n in names)
-
-
-# --- SVF backend: must satisfy the SAME soundness invariant as type-based ---
-
-
-# c_codec_table reproduces a real SVF under-approximation: a function pointer
-# stored into a struct field by an init function reached through a global codec
-# table is dropped by SVF's points-to (the libtiff PackBitsPreEncode bug). The
-# memory-escape augmentation must recover it.
-@pytest.mark.parametrize("fixture", ["c_direct", "c_fnptr", "cpp_virtual", "c_codec_table"])
-@pytest.mark.skipif(not HAVE_GLLVM, reason="gllvm not installed")
-def test_svf_c_cpp_sound(svf_analyzer, tmp_path, fixture):
-    work = tmp_path / fixture
-    shutil.copytree(os.path.join(FIXTURES, fixture), work)
-    tc = _tc(svf_analyzer)
-    bcs = acquire_c.acquire_c_bitcode(str(work), tc, "main.o")
-    merged = link.link_bitcode(bcs, str(work / "merged.bc"), tc)
-    result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"], backend="svf")
-    assert result["backend"] == "svf"
-    assert_soundness(result, _expected(fixture))
-
-
-@pytest.mark.skipif(not shutil.which("cargo"), reason="cargo not installed")
-def test_svf_rust_dyn_sound(svf_analyzer, tmp_path):
-    work = tmp_path / "rust_dyn"
-    shutil.copytree(os.path.join(FIXTURES, "rust_dyn"), work)
-    tc = _tc(svf_analyzer)
-    _require_rust_readable(tc)
-    bcs = acquire_rust.acquire_rust_bitcode(str(work))
-    merged = link.link_bitcode(bcs, str(work / "merged.bc"), tc)
-    result = analyze.analyze(merged, tc, ["LLVMFuzzerTestOneInput"], backend="svf")
-    assert_soundness(result, _expected("rust_dyn"))

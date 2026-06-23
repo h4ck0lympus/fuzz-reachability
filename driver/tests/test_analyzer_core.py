@@ -67,30 +67,14 @@ def test_indirect_any_includes_other(run_analyzer):
     assert {"opt_a", "opt_b"} <= names
 
 
-def test_svf_unavailable_errors(run_analyzer):
+def test_backend_flag_deprecated_and_ignored(run_analyzer):
+    # --backend is accepted for backward compatibility but warns and is ignored;
+    # the type-based backend is always used.
     r = run_analyzer([TWO(), "--entry", "caller", "--backend", "svf"])
-    assert r.returncode != 0
-    assert "SVF backend not available" in r.stderr
-
-
-def test_unknown_backend_errors(run_analyzer):
-    r = run_analyzer([TWO(), "--entry", "caller", "--backend", "bogus"])
-    assert r.returncode == 2
-
-
-def test_svf_backend_sound(svf_analyzer):
-    # SVF must soundly resolve the indirect call and emit clean JSON on stdout.
-    import subprocess
-
-    r = subprocess.run(
-        [svf_analyzer, FNPTR(), "--entry", "entry", "--backend", "svf"],
-        capture_output=True, text=True,
-    )
     assert r.returncode == 0, r.stderr
-    j = json.loads(r.stdout)  # would fail if SVF stats leaked to stdout
-    assert j["backend"] == "svf"
-    names = {f["mangled"] for f in j["reachable"]}
-    assert {"opt_a", "opt_b", "entry"} <= names  # sound: both real targets present
+    assert "deprecated and ignored" in r.stderr
+    j = json.loads(r.stdout)
+    assert j["backend"] == "type-based"
 
 
 def test_missing_entry_suggests_near_miss(run_analyzer):
