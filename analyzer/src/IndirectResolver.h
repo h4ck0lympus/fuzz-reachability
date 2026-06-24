@@ -1,5 +1,6 @@
 #pragma once
 
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Module.h"
@@ -14,7 +15,7 @@ struct IndirectResolver {
   // Precompute over the whole module once before resolve() calls.
   virtual void prepare(llvm::Module &m) = 0;
   // Candidate callees for one indirect call site (over-approximation).
-  virtual std::vector<llvm::Function *> resolve(llvm::CallBase &cb) = 0;
+  virtual llvm::ArrayRef<llvm::Function *> resolve(llvm::CallBase &cb) = 0;
 };
 
 } // namespace reach

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Module.h"
@@ -22,6 +23,8 @@ public:
 
 private:
   EdgeMap Edges;
+  llvm::DenseSet<std::pair<llvm::Function *, llvm::Function *>> SeenDirect;
+  llvm::DenseSet<std::pair<llvm::Function *, llvm::Function *>> SeenIndirect;
 };
 
 struct IndirectResolver; // defined in IndirectResolver.h

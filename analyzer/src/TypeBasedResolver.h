@@ -13,7 +13,7 @@ namespace reach {
 class TypeBasedResolver : public IndirectResolver {
 public:
   void prepare(llvm::Module &m) override;
-  std::vector<llvm::Function *> resolve(llvm::CallBase &cb) override;
+  llvm::ArrayRef<llvm::Function *> resolve(llvm::CallBase &cb) override;
 
 private:
   llvm::DenseMap<llvm::FunctionType *, llvm::SmallVector<llvm::Function *, 4>>
@@ -25,7 +25,7 @@ private:
 class AnyResolver : public IndirectResolver {
 public:
   void prepare(llvm::Module &m) override;
-  std::vector<llvm::Function *> resolve(llvm::CallBase &cb) override;
+  llvm::ArrayRef<llvm::Function *> resolve(llvm::CallBase &cb) override;
 
 private:
   std::vector<llvm::Function *> AddressTaken;

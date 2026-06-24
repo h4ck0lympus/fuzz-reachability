@@ -15,11 +15,9 @@ using namespace llvm;
 namespace reach {
 
 void CallGraph::addEdge(Function *from, Function *to, EdgeKind kind) {
-  auto &v = Edges[from];
-  for (auto &e : v)
-    if (e.first == to && e.second == kind)
-      return;
-  v.push_back({to, kind});
+  auto &seen = kind == EdgeKind::Direct ? SeenDirect : SeenIndirect;
+  if (seen.insert({from, to}).second)
+    Edges[from].push_back({to, kind});
 }
 
 // Resolve a CallBase to a concrete callee, seeing through bitcasts and aliases.
