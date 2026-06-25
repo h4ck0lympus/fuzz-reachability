@@ -8,6 +8,11 @@
 #include "Toolchain.h"
 #include "TypeBasedResolver.h"
 
+#include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringSet.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/FileSystem.h"
@@ -17,6 +22,7 @@
 #include <memory>
 #include <set>
 #include <utility>
+#include <vector>
 
 using namespace llvm;
 
@@ -47,6 +53,13 @@ static cl::opt<std::string> NotReachedOut("not-reached-out", cl::init(""),
 static cl::opt<std::string> SelfTestDemangle("selftest-demangle", cl::init(""),
                                              cl::desc("print demangle(SYMBOL) and exit"));
 static cl::opt<bool> DumpEdges("dump-edges", cl::desc("debug: print call-graph edges"));
+static cl::opt<bool> NoNameRoots("no-name-roots",
+                                 cl::desc("disable treating a defined, externally-visible "
+                                          "function whose symbol name appears as a string "
+                                          "constant as an extra root. That heuristic recovers "
+                                          "functions reached only by runtime name lookup "
+                                          "(dlsym/dlopen-by-name); it is on by default and "
+                                          "active only when the module performs such a lookup."));
 
 namespace {
 
@@ -140,6 +153,68 @@ void resolveEntries(Module &m, const std::vector<std::string> &requested,
   }
 }
 
+// Functions reached only through a runtime symbol lookup (dlsym/dlopen-family):
+// a defined, externally-visible function whose linkage name appears verbatim as
+// a string constant. Such a function has no in-IR caller and no taken address,
+// so neither the direct, indirect, nor escape edge builders can see it -- yet
+//   let f = dlsym(handle, c"name"); f(x);
+// calls it at runtime. We recover it by matching the name and adding it as a
+// root. Sound: extra roots only widen the over-approximation (see resolveEntries).
+// Gated on the module actually performing a dynamic lookup, so projects that do
+// not use dlsym are unaffected. Returns the mangled names of the added roots.
+std::vector<std::string> collectNameReferencedRoots(Module &m) {
+  std::vector<std::string> added;
+  static const char *dynLookup[] = {"dlsym", "dlvsym", "dlopen", "dlmopen",
+                                     "GetProcAddress"};
+  bool hasDyn = false;
+  for (const char *n : dynLookup)
+    if (m.getFunction(n)) {
+      hasDyn = true;
+      break;
+    }
+  if (!hasDyn)
+    return added;
+
+  // Collect NUL-separated tokens from every byte-string constant, descending
+  // through constant aggregates/expressions (e.g. string tables, struct fields).
+  StringSet<> strings;
+  SmallVector<Constant *, 16> work;
+  DenseSet<Constant *> visited;
+  for (GlobalVariable &g : m.globals())
+    if (g.hasInitializer())
+      work.push_back(g.getInitializer());
+  while (!work.empty()) {
+    Constant *c = work.pop_back_val();
+    if (!c || !visited.insert(c).second)
+      continue;
+    if (auto *cds = dyn_cast<ConstantDataSequential>(c)) {
+      if (cds->isString()) {
+        StringRef raw = cds->getRawDataValues();
+        size_t pos = 0;
+        while (pos < raw.size()) {
+          size_t nul = raw.find('\0', pos);
+          if (nul == StringRef::npos)
+            nul = raw.size();
+          StringRef tok = raw.substr(pos, nul - pos);
+          if (!tok.empty())
+            strings.insert(tok);
+          pos = nul + 1;
+        }
+      }
+      continue;
+    }
+    if (isa<ConstantAggregate>(c) || isa<ConstantExpr>(c))
+      for (const Use &op : c->operands())
+        if (auto *oc = dyn_cast<Constant>(op.get()))
+          work.push_back(oc);
+  }
+
+  for (Function &f : m)
+    if (!f.isDeclaration() && !f.hasLocalLinkage() && strings.count(f.getName()))
+      added.push_back(f.getName().str());
+  return added;
+}
+
 void disableDebugInfoAutoUpgrade() {
   auto &opts = cl::getRegisteredOptions();
   auto it = opts.find("disable-auto-upgrade-debug-info");
@@ -217,7 +292,25 @@ int main(int argc, char **argv) {
     errs() << "\n";
   }
 
-  reach::ReachResult res = reach::computeReachability(*mod, graph, entries);
+  std::vector<std::string> roots = entries;
+  if (!NoNameRoots) {
+    std::set<std::string> have(roots.begin(), roots.end());
+    std::vector<std::string> added;
+    for (const std::string &n : collectNameReferencedRoots(*mod))
+      if (have.insert(n).second) {
+        roots.push_back(n);
+        added.push_back(n);
+      }
+    if (!added.empty()) {
+      errs() << "note: added " << added.size()
+             << " root(s) referenced by name (dlsym/dlopen-by-name reachability):";
+      for (const std::string &n : added)
+        errs() << " " << n;
+      errs() << "\n";
+    }
+  }
+
+  reach::ReachResult res = reach::computeReachability(*mod, graph, roots);
   if (res.reached.empty()) {
     suggestEntries(*mod, requested);
     return 1;

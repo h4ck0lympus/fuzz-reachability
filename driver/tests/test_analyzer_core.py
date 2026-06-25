@@ -134,6 +134,34 @@ def test_entry_fuzz_target_alias(run_analyzer):
     assert "_ZN4demo4main17h1111111111111111E" not in names
 
 
+def test_dlsym_byname_root(run_analyzer):
+    # A function reached only via a dlsym-by-name lookup is recovered as a root.
+    r = run_analyzer([ll("dlsym_byname.ll"), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    names = {f["mangled"] for f in json.loads(r.stdout)["reachable"]}
+    assert "dyn_target" in names
+    # negative controls: exported-but-unnamed and internal-but-named stay out.
+    assert "exported_unused" not in names
+    assert "internal_named" not in names
+    assert "added 1 root" in r.stderr and "dyn_target" in r.stderr
+
+
+def test_dlsym_byname_disabled(run_analyzer):
+    # --no-name-roots turns the heuristic off; the function is unreachable again.
+    r = run_analyzer([ll("dlsym_byname.ll"), "--entry", "entry", "--no-name-roots"])
+    assert r.returncode == 0, r.stderr
+    names = {f["mangled"] for f in json.loads(r.stdout)["reachable"]}
+    assert "dyn_target" not in names
+
+
+def test_name_root_gated_on_dynamic_lookup(run_analyzer):
+    # Without a dlsym/dlopen-family call, a matching name string adds no root.
+    r = run_analyzer([ll("name_no_dlsym.ll"), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    names = {f["mangled"] for f in json.loads(r.stdout)["reachable"]}
+    assert "dyn_target" not in names
+
+
 def test_v0_demangle_selftest(run_analyzer):
     r = run_analyzer(["--selftest-demangle", "_RNvCs1234_4core3foo"])
     assert r.returncode == 0

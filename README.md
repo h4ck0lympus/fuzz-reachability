@@ -466,6 +466,26 @@ address-taken function regardless of type.
 See [`docs/llvm-support.md`](docs/llvm-support.md) for the LLVM compatibility
 matrix.
 
+## Reachability through runtime symbol lookup
+
+A function can be reached with no call edge in the bitcode at all: code that
+resolves a symbol **by name** at run time — `dlsym`/`dlvsym`/`dlopen`/`dlmopen`
+on Unix, `GetProcAddress` on Windows — and calls the result. The target then has
+no direct caller, no taken address, and nothing for the type-based or escape
+resolvers to latch onto; its only tie to the program is the **string constant**
+holding its name.
+
+The analyzer recovers these. When the module actually performs such a lookup,
+any **defined, externally visible** function whose symbol name appears verbatim
+as a string constant is added as a reachability **root**. External visibility is
+required because `dlsym` only resolves symbols in the dynamic symbol table, which
+excludes `internal` functions; gating on the presence of a lookup keeps the
+heuristic inert for programs that never resolve by name. Like every root, this
+only widens the sound over-approximation. The `--no-name-roots` flag disables it.
+
+(`fixtures/rust_indirect` exercises this with a `dlsym`-resolved `#[no_mangle]`
+target; see also `driver/tests/test_analyzer_core.py`.)
+
 ## Historical note: the removed SVF backend
 
 Earlier versions shipped an optional second backend, `--backend=svf`, built on
