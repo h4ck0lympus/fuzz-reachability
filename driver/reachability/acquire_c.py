@@ -5,6 +5,11 @@ metadata into each object), then run get-bc on the built artifact to extract a
 whole-program .bc. The artifact is auto-detected from the build output when not
 given explicitly. Independent of the project's own LTO setup.
 
+When the build command is auto-detected (no explicit --build-cmd), it also forces
+a static build wherever the build system allows it, because shared libraries are
+built and linked separately and their bitcode never reaches the target. See
+detect_build_cmd for the per-build-system flags.
+
 Static-library expansion: a linked binary only embeds the archive members the
 linker actually pulled in, so functions in unreferenced members of a static
 library would otherwise be invisible to the analysis. With static_libs="auto"
@@ -55,6 +60,40 @@ def _build_env(clang_bindir: str) -> dict:
     return env
 
 
+_AUTOTOOLS_STATIC_FLAGS = ("--disable-shared", "--enable-static")
+
+
+def _configure_help(project_dir):
+    """`./configure --help` text for the project, or "" when it cannot be run.
+    Tries to exec the script directly, falling back to `sh configure` only when
+    exec fails (e.g. the file is not marked executable) -- never on empty output,
+    so a configure that ignores `--help` is not accidentally run a second time."""
+    for argv in (["./configure", "--help"], ["sh", "configure", "--help"]):
+        try:
+            r = subprocess.run(argv, cwd=project_dir, capture_output=True,
+                               text=True, timeout=60)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        return (r.stdout or "") + (r.stderr or "")
+    return ""
+
+
+def _configure_static_flags(project_dir):
+    """The static-linking options a project's `configure` understands, found by
+    probing `./configure --help`. libtool prints the `--enable-shared` /
+    `--enable-static` forms (never the `--disable-` ones), so the presence of
+    `--enable-shared` is what tells us `--disable-shared` is accepted. Returns the
+    subset of `--disable-shared` / `--enable-static` to pass, in that order; empty
+    when the script is not libtool-based and has no such knobs."""
+    help_text = _configure_help(project_dir)
+    flags = []
+    if "--enable-shared" in help_text:
+        flags.append("--disable-shared")
+    if "--enable-static" in help_text:
+        flags.append("--enable-static")
+    return flags
+
+
 def detect_build_cmd(project_dir):
     """Pick a build command for a C/C++ project by probing for the well-known
     build files, in the order configure -> make -> cmake -> ninja -> meson, with
@@ -62,24 +101,39 @@ def detect_build_cmd(project_dir):
     nothing is recognized (the caller then falls back to plain `make`). The
     gllvm wrappers are injected via CC/CXX, which every build system below
     honours at configure time, so the chosen command embeds bitcode regardless.
+
+    Shared libraries are problematic for the analysis: a `.so` is built and
+    linked separately, so its bitcode never lands in the target and get-bc cannot
+    reach it (only static archives are expanded later). So the auto-detected
+    command forces a static build wherever the build system supports it:
+    `--disable-shared`/`--enable-static` for an existing `configure` (each added
+    only if `configure --help` lists it), `-DBUILD_SHARED_LIBS=OFF` for CMake,
+    and `--default-library=static` for Meson -- both unconditional, being
+    built-in toggles those tools always accept. The autotools-bootstrap paths add
+    `--disable-shared --enable-static` directly, since the configure they
+    regenerate does not exist yet to probe and autoconf only warns (never errors)
+    on options it does not recognize. Plain make/ninja trees have no portable
+    static toggle and are left untouched. An explicit `--build-cmd` bypasses all
+    of this.
     """
     def has(*names):
         return any(os.path.exists(os.path.join(project_dir, n)) for n in names)
 
     if has("configure"):
-        return "./configure && make"
+        flags = "".join(" " + f for f in _configure_static_flags(project_dir))
+        return f"./configure{flags} && make"
     if has("Makefile", "makefile", "GNUmakefile"):
         return "make"
     if has("CMakeLists.txt"):
-        return "cmake -S . -B build && cmake --build build"
+        return "cmake -S . -B build -DBUILD_SHARED_LIBS=OFF && cmake --build build"
     if has("build.ninja"):
         return "ninja"
     if has("meson.build"):
-        return "meson setup build && ninja -C build"
+        return "meson setup build --default-library=static && ninja -C build"
     if has("autogen.sh"):
-        return "./autogen.sh && ./configure && make"
+        return "./autogen.sh && ./configure --disable-shared --enable-static && make"
     if has("configure.ac", "configure.in"):
-        return "autoreconf -i && ./configure && make"
+        return "autoreconf -i && ./configure --disable-shared --enable-static && make"
     return None
 
 

@@ -48,14 +48,14 @@ def test_detect_build_cmd_make(tmp_path):
 def test_detect_build_cmd_cmake(tmp_path):
     (tmp_path / "CMakeLists.txt").write_text("project(x)\n")
     assert acquire_c.detect_build_cmd(str(tmp_path)) == (
-        "cmake -S . -B build && cmake --build build"
+        "cmake -S . -B build -DBUILD_SHARED_LIBS=OFF && cmake --build build"
     )
 
 
 def test_detect_build_cmd_meson(tmp_path):
     (tmp_path / "meson.build").write_text("project('x', 'c')\n")
     assert acquire_c.detect_build_cmd(str(tmp_path)) == (
-        "meson setup build && ninja -C build"
+        "meson setup build --default-library=static && ninja -C build"
     )
 
 
@@ -64,10 +64,59 @@ def test_detect_build_cmd_ninja(tmp_path):
     assert acquire_c.detect_build_cmd(str(tmp_path)) == "ninja"
 
 
+def _write_configure(tmp_path, help_text):
+    """Drop an executable ./configure that prints `help_text` for any args."""
+    script = "#!/bin/sh\ncat <<'EOF'\n" + help_text + "\nEOF\n"
+    _write(str(tmp_path / "configure"), script.encode(), executable=True)
+
+
 def test_detect_build_cmd_configure_precedes_make(tmp_path):
+    # A configure that prints no libtool help yields no static flags.
     (tmp_path / "configure").write_text("#!/bin/sh\n")
     (tmp_path / "Makefile").write_text("all:\n\ttrue\n")
     assert acquire_c.detect_build_cmd(str(tmp_path)) == "./configure && make"
+
+
+def test_detect_build_cmd_configure_static_flags(tmp_path):
+    _write_configure(tmp_path,
+                     "  --enable-shared[=PKGS]  build shared libraries\n"
+                     "  --enable-static[=PKGS]  build static libraries\n")
+    assert acquire_c.detect_build_cmd(str(tmp_path)) == (
+        "./configure --disable-shared --enable-static && make"
+    )
+
+
+def test_detect_build_cmd_configure_only_static(tmp_path):
+    _write_configure(tmp_path, "  --enable-static  build static libraries\n")
+    assert acquire_c.detect_build_cmd(str(tmp_path)) == (
+        "./configure --enable-static && make"
+    )
+
+
+def test_configure_static_flags_non_executable_falls_back_to_sh(tmp_path):
+    # Not marked executable: exec fails, the `sh configure` fallback runs it.
+    (tmp_path / "configure").write_text(
+        "#!/bin/sh\necho '  --enable-shared  build shared libraries'\n"
+    )
+    assert acquire_c._configure_static_flags(str(tmp_path)) == ["--disable-shared"]
+
+
+def test_configure_static_flags_none_when_no_configure(tmp_path):
+    assert acquire_c._configure_static_flags(str(tmp_path)) == []
+
+
+def test_detect_build_cmd_autogen_forces_static(tmp_path):
+    (tmp_path / "autogen.sh").write_text("#!/bin/sh\n")
+    assert acquire_c.detect_build_cmd(str(tmp_path)) == (
+        "./autogen.sh && ./configure --disable-shared --enable-static && make"
+    )
+
+
+def test_detect_build_cmd_configure_ac_forces_static(tmp_path):
+    (tmp_path / "configure.ac").write_text("AC_INIT([x],[1])\n")
+    assert acquire_c.detect_build_cmd(str(tmp_path)) == (
+        "autoreconf -i && ./configure --disable-shared --enable-static && make"
+    )
 
 
 def test_find_artifacts_prefers_executable_over_object(tmp_path):
