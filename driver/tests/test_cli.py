@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import types
 
 import pytest
 
@@ -162,7 +163,8 @@ def test_clean_c_removes_build_artifacts_and_outputs(tmp_path, capsys):
     cli._clean_project(_clean_args(proj, "c", out), verbose=False)
 
     assert not (proj / "merged.bc").exists()
-    assert not (proj / "build").exists()
+    assert (proj / "build").exists()
+    assert not (proj / "build" / "nested.o").exists()
     assert not (proj / "reachability.json").exists()
     assert not (proj / "reached.txt").exists()
     assert not (proj / "not_reached.txt").exists()
@@ -173,6 +175,31 @@ def test_clean_c_removes_build_artifacts_and_outputs(tmp_path, capsys):
     assert keep.exists()
     assert (git / "obj.o").exists()
     assert "clean: removed" in capsys.readouterr().out
+
+
+def test_clean_c_runs_build_system_clean(tmp_path, monkeypatch):
+    """A configured build tree is cleaned in place with its own tool; the
+    directory itself is kept and any leftover objects are still removed."""
+    proj = tmp_path / "cproj"
+    bdir = proj / "build"; bdir.mkdir(parents=True)
+    (bdir / "Makefile").write_text("clean:\n\t:\n")
+    (bdir / "obj.o").write_text("x")
+
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        return types.SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(cli.shutil, "which", lambda name: "/usr/bin/" + name)
+    monkeypatch.setattr(cli.subprocess, "run", fake_run)
+
+    out = proj / "reachability.json"
+    cli._clean_project(_clean_args(proj, "c", out), verbose=False)
+
+    assert ["make", "-C", str(bdir), "clean"] in calls
+    assert bdir.exists()
+    assert not (bdir / "obj.o").exists()
 
 
 def test_clean_rust_removes_target_dir(tmp_path, monkeypatch):

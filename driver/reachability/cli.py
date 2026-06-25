@@ -103,7 +103,6 @@ def _acquire(args, tc, verbose=False):
 
 
 _C_CLEAN_SUFFIXES = (".bc", ".o", ".llvm.manifest")
-_C_CLEAN_DIRS = {"build"}
 
 
 def _cargo_clean(directory, verbose=False):
@@ -124,21 +123,51 @@ def _cargo_clean(directory, verbose=False):
             print(f"  removed {target}")
 
 
-def _clean_c_artifacts(project, drop):
-    """Remove a C/C++ build's caches under `project`: any `build/` directory
-    (cmake/meson/ninja) and every object / extracted-bitcode file (`*.o`,
-    `*.bc`, `*.llvm.manifest`), so the next gllvm build recompiles from clean.
-    All of these are build artifacts (see .gitignore)."""
+def _build_clean_cmd(directory):
+    """The in-place clean invocation for a configured build tree at `directory`,
+    chosen from the build-system files it holds, or None when none is present.
+    `ninja -t clean` covers meson and cmake's ninja generator as well as a plain
+    ninja tree; `make clean` covers in-source make and cmake's make generator;
+    `cmake --build --target clean` is the generator-agnostic fallback."""
+    def has(*names):
+        return any(os.path.exists(os.path.join(directory, n)) for n in names)
+    if has("build.ninja"):
+        return ["ninja", "-C", directory, "-t", "clean"]
+    if has("Makefile", "makefile", "GNUmakefile"):
+        return ["make", "-C", directory, "clean"]
+    if has("CMakeCache.txt"):
+        return ["cmake", "--build", directory, "--target", "clean"]
+    return None
+
+
+def _run_clean(cmd, directory, verbose):
+    """Run a build-system clean in `directory`, skipping it when the tool is not
+    installed. Output is captured unless verbose; a non-zero exit (e.g. a tree
+    with no clean target) is ignored — the object-file sweep is the backstop."""
+    if not shutil.which(cmd[0]):
+        if verbose:
+            print(f"  skip clean in {directory}: {cmd[0]} not installed")
+        return
+    if verbose:
+        print(f"  {' '.join(cmd)}")
+    subprocess.run(cmd, cwd=directory, capture_output=not verbose, text=True)
+
+
+def _clean_c_artifacts(project, drop, verbose=False):
+    """Clean a C/C++ build in place under `project` without deleting build
+    directories — some projects build in-source and have none. Each configured
+    build tree is cleaned with its own tool (make/ninja/cmake/meson, see
+    `_build_clean_cmd`), then every leftover object / extracted-bitcode file
+    (`*.o`, `*.bc`, `*.llvm.manifest`) is removed so the next gllvm build
+    recompiles from clean. All of these are build artifacts (see .gitignore)."""
+    cleaned = []
     for root, dirs, files in os.walk(project):
-        keep = []
-        for d in dirs:
-            if d in acquire_c._SKIP_DIRS:
-                continue
-            if d in _C_CLEAN_DIRS:
-                drop(os.path.join(root, d))
-                continue
-            keep.append(d)
-        dirs[:] = keep
+        dirs[:] = [d for d in dirs if d not in acquire_c._SKIP_DIRS]
+        if not any(root == c or root.startswith(c + os.sep) for c in cleaned):
+            cmd = _build_clean_cmd(root)
+            if cmd is not None:
+                _run_clean(cmd, root, verbose)
+                cleaned.append(root)
         for f in files:
             if f.endswith(_C_CLEAN_SUFFIXES):
                 drop(os.path.join(root, f))
@@ -148,10 +177,11 @@ def _clean_project(args, verbose=False):
     """Remove cached build artifacts and prior outputs under --project so the
     run rebuilds from clean (a cached build otherwise yields stale or empty
     bitcode). Rust targets get `cargo clean` (and the same for fuzz/ so
-    cargo-fuzz's fuzz/target is dropped); C/C++ targets have their build/
-    directories and object/bitcode files removed. The merged module and any
-    prior reachability.json / reached.txt / not_reached.txt (and --dot) are
-    removed for every target."""
+    cargo-fuzz's fuzz/target is dropped); C/C++ targets are cleaned in place
+    with their own build system (build directories are kept, since some
+    projects build in-source) and their object/bitcode files removed. The
+    merged module and any prior reachability.json / reached.txt /
+    not_reached.txt (and --dot) are removed for every target."""
     project = args.project
     removed = 0
 
@@ -186,7 +216,7 @@ def _clean_project(args, verbose=False):
         if os.path.isdir(fuzz):
             _cargo_clean(fuzz, verbose)
     if mode in ("c", "cpp", "mixed"):
-        _clean_c_artifacts(project, drop)
+        _clean_c_artifacts(project, drop, verbose)
 
     print(f"clean: removed {removed} cached path(s) under {project}")
 
@@ -317,7 +347,9 @@ def build_parser():
                         "--project before building, so the run rebuilds from "
                         "clean (a cached build otherwise yields stale or empty "
                         "bitcode). Rust: `cargo clean` (also in fuzz/ for "
-                        "cargo-fuzz). C/C++: removes build/ dirs and *.o/*.bc. "
+                        "cargo-fuzz). C/C++: runs the build system's own clean "
+                        "(make/ninja/cmake/meson) in each build tree and "
+                        "removes *.o/*.bc (build dirs are kept). "
                         "Always removes merged.bc and any prior "
                         "reachability.json/reached.txt/not_reached.txt/--dot.")
     r.add_argument("--dot", default=None)
