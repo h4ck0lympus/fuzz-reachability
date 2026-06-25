@@ -302,4 +302,52 @@ void buildEscapeEdges(Module &m, CallGraph &g) {
   }
 }
 
+DenseSet<Function *> computeAddressFlowTargets(Module &m) {
+  EscapeIndex idx;
+  buildEscapeIndex(m, idx);
+
+  // Root the value-flow at every place an address could be consumed as a
+  // callable: an indirect call's callee operand, and the arguments/returns that
+  // reach unanalyzable *code* that might call them. Inline asm and intrinsics
+  // are excluded: an asm operand (e.g. `std::hint::black_box`, lowered to empty
+  // `asm sideeffect ""`) and intrinsics (`llvm.lifetime`, `memcpy`, `dbg`, ...)
+  // observe or move a value but cannot invoke an arbitrary function, so an
+  // address handed only to them is not evidence of being callable. A function
+  // carried to a remaining root has concrete flow evidence, not just a type
+  // match. (Confidence-only; reachability/escape edges are unaffected and stay
+  // sound.)
+  std::vector<Value *> roots;
+  for (Function &f : m) {
+    if (f.isDeclaration())
+      continue;
+    for (Instruction &i : instructions(f)) {
+      if (auto *cb = dyn_cast<CallBase>(&i)) {
+        if (cb->isInlineAsm())
+          continue;
+        Function *callee = cb->getCalledFunction();
+        if (callee && callee->isIntrinsic())
+          continue;
+        if (isIndirect(*cb))
+          roots.push_back(cb->getCalledOperand());
+        if (!callsAnalyzableCallee(*cb))
+          for (const Use &argU : cb->args())
+            roots.push_back(argU.get());
+      } else if (auto *ret = dyn_cast<ReturnInst>(&i)) {
+        if (Value *rv = ret->getReturnValue())
+          roots.push_back(rv);
+      }
+    }
+  }
+
+  DenseMap<Value *, unsigned> sccOf;
+  std::vector<SmallVector<Function *, 4>> sccSinks;
+  computeEscapeSets(roots, idx, sccOf, sccSinks);
+
+  DenseSet<Function *> out;
+  for (const auto &sink : sccSinks)
+    for (Function *f : sink)
+      out.insert(f);
+  return out;
+}
+
 } // namespace reach

@@ -165,7 +165,7 @@ reachability run --lang c --project fixtures/c_direct --out c.json -v
 ```
 
 ```
-reachable 3 / defined 4  (0 indirect-only, 1 unreachable)  [backend=type-based]
+reachable 3 / defined 4  (0 indirect-only, 0 low-confidence, 1 unreachable)  [backend=type-based]
 ```
 
 `LLVMFuzzerTestOneInput → used_a → used_b` are reachable; `dead_fn` lands in
@@ -416,9 +416,10 @@ cannot recover a function that one build inlined away and the other did not.
 
 `reachability run` writes three files:
 
-- **`<out>.json`** — `summary` counts, a `reachable` array (mangled and demangled
-  name, source file/line when debug info is present, `via` =
-  `direct`/`indirect`/`both`, and an `indirect_only` flag), and an
+- **`<out>.json`** — `summary` counts (including `low_confidence`), a `reachable`
+  array (mangled and demangled name, source file/line when debug info is present,
+  `via` = `direct`/`indirect`/`both`, an `indirect_only` flag, and a `confidence`
+  of `high`/`medium`/`low` — see [Confidence](#confidence)), and an
   `unreachable_defined` array. With `--dot FILE`, also the reachable subgraph.
 - **`reached.txt`** — a SanitizerCoverage **allowlist** of reachable functions.
 - **`not_reached.txt`** — a SanitizerCoverage **ignorelist** of unreachable
@@ -485,6 +486,41 @@ only widens the sound over-approximation. The `--no-name-roots` flag disables it
 
 (`fixtures/rust_indirect` exercises this with a `dlsym`-resolved `#[no_mangle]`
 target; see also `driver/tests/test_analyzer_core.py`.)
+
+## Confidence
+
+The type-based resolver is a sound over-approximation, so some reachable
+functions are reported only because a function of their type is called somewhere
+and their address was taken — not because their address demonstrably reaches a
+call. Each reachable function in the JSON therefore carries a `confidence`:
+
+- **`high`** — reached by a concrete direct call (or it is a root). The IR
+  literally calls it.
+- **`medium`** — reached only indirectly, but value-flow shows the address is
+  used as a callable: it reaches the callee operand of an indirect call (through
+  globals, vtables, tables, `select`/`phi`, loads/stores), or it escapes as an
+  argument/return to external code that may call it (`qsort`, `signal`,
+  `pthread_create`, …).
+- **`low`** — reached only by a *type match*, with no value-flow evidence the
+  address is ever used as a callable. This is the soft, likely-spurious surface
+  of the over-approximation (e.g. a function pointer that is only taken, cast to
+  an integer, and stored or XOR-ed but never called). `summary.low_confidence`
+  counts these.
+
+It is computed by re-running the escape value-flow rooted at indirect callee
+operands and at non-asm, non-intrinsic escapes; inline asm (`std::hint::black_box`
+lowers to empty `asm sideeffect ""`) and intrinsics (`llvm.lifetime`, `memcpy`,
+`dbg`, …) observe or move a value but cannot invoke it, so they do not count as
+callable sinks.
+
+**`confidence` is a triage hint, not a verdict.** It never changes the reachable
+set: `reached.txt` and `not_reached.txt` are unaffected, and a `low` function
+stays in the allowlist. The signal is heuristic on purpose — a *genuine* target
+whose address is laundered through integer arithmetic (`ptrtoint`→`inttoptr`),
+reached only via an inline-asm `call`, or invoked only as a startup constructor
+can rate `low`; conversely a true decoy whose address escapes to a real callable
+sink can rate `medium`. Treat `low` as "worth auditing", not "safe to remove".
+(See `driver/tests/test_analyzer_core.py::test_confidence_tiers`.)
 
 ## Historical note: the removed SVF backend
 

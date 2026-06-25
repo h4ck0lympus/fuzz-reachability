@@ -2,6 +2,7 @@
 
 #include "CallGraph.h"
 #include "Reachability.h"
+#include "llvm/ADT/DenseSet.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/raw_ostream.h"
 #include <string>
@@ -9,7 +10,10 @@
 
 namespace reach {
 // Emit the machine-readable reachability report (spec section 5).
+// flowTargets carries the address-flow evidence used to annotate per-function
+// confidence (see computeAddressFlowTargets).
 void writeJson(llvm::raw_ostream &os, llvm::Module &m, const CallGraph &g,
                const ReachResult &res, llvm::StringRef backend,
-               const std::vector<std::string> &entries);
+               const std::vector<std::string> &entries,
+               const llvm::DenseSet<llvm::Function *> &flowTargets);
 }

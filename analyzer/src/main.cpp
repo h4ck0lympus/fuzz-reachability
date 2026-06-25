@@ -316,6 +316,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  auto flowTargets = reach::computeAddressFlowTargets(*mod);
+
   auto writeFile = [&](const std::string &path, const char *what,
                        const std::function<void(raw_ostream &)> &fn) -> bool {
     std::error_code ec;
@@ -343,7 +345,7 @@ int main(int argc, char **argv) {
 
   const char *backendName = IndirectAny ? "indirect-any" : "type-based";
   if (OutFile.empty()) {
-    reach::writeJson(outs(), *mod, graph, res, backendName, entries);
+    reach::writeJson(outs(), *mod, graph, res, backendName, entries, flowTargets);
   } else {
     std::error_code ec;
     raw_fd_ostream out(OutFile, ec, sys::fs::OF_Text);
@@ -352,7 +354,7 @@ int main(int argc, char **argv) {
              << "\n";
       return 1;
     }
-    reach::writeJson(out, *mod, graph, res, backendName, entries);
+    reach::writeJson(out, *mod, graph, res, backendName, entries, flowTargets);
   }
   return 0;
 }

@@ -37,4 +37,12 @@ void buildIndirectEdges(llvm::Module &m, CallGraph &g, IndirectResolver &r);
 
 void buildEscapeEdges(llvm::Module &m, CallGraph &g);
 
+// Functions for which there is concrete value-flow evidence that the address is
+// used as a callable -- it reaches the callee operand of an indirect call, or
+// escapes as an argument/return to unanalyzable code -- beyond a bare type
+// match. Used only to annotate reachability *confidence*; it never prunes the
+// (sound) reachable set. A function reached purely by type matching but absent
+// here is a low-confidence (likely-spurious) indirect target.
+llvm::DenseSet<llvm::Function *> computeAddressFlowTargets(llvm::Module &m);
+
 } // namespace reach

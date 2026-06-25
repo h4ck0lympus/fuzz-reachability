@@ -162,6 +162,23 @@ def test_name_root_gated_on_dynamic_lookup(run_analyzer):
     assert "dyn_target" not in names
 
 
+def test_confidence_tiers(run_analyzer):
+    # Per-function confidence: high (direct), medium (value-flow evidence the
+    # address is callable), low (type match only, no flow evidence).
+    r = run_analyzer([ll("confidence.ll"), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    j = json.loads(r.stdout)
+    conf = {f["mangled"]: f["confidence"] for f in j["reachable"]}
+    assert conf["entry"] == "high"          # root
+    assert conf["direct_leaf"] == "high"    # direct edge
+    assert conf["cb_target"] == "medium"    # address escapes to an external fn
+    assert conf["real_target"] == "medium"  # address flows via a global to a callee
+    assert conf["decoy"] == "low"           # type match only; address sinks into asm
+    assert j["summary"]["low_confidence"] == 1
+    # decoy is still reachable -- confidence annotates, never prunes.
+    assert "decoy" in conf
+
+
 def test_v0_demangle_selftest(run_analyzer):
     r = run_analyzer(["--selftest-demangle", "_RNvCs1234_4core3foo"])
     assert r.returncode == 0
