@@ -80,7 +80,8 @@ public headers live under `include/`, so it is compiled with `-I include`.
 One command builds the library, compiles the harness, and analyzes the result:
 
 ```bash
-reachability run --lang cpp \
+reachability run \
+  --lang cpp \
   --project . \
   --build-cmd './configure --without-python --disable-shared && make -j"$(nproc)" && gclang++ -I include -c harness.cc -o harness.o' \
   --artifact harness.o \
@@ -96,7 +97,10 @@ What each piece does:
   `CC=gclang` / `CXX=gclang++`), so `./configure && make` builds `libxml2.a`
   with embedded bitcode, and `gclang++ -c harness.cc` compiles the harness to a
   bitcode-carrying object. `--without-python --disable-shared` keeps the build
-  small and produces a static `.libs/libxml2.a`.
+  small and produces a static `.libs/libxml2.a`. (An auto-detected `configure`
+  build now forces `--disable-shared --enable-static` itself; the flag is spelled
+  out here only because this `--build-cmd` is explicit — it also compiles the
+  harness.)
 - **`--artifact harness.o`** picks the harness object as the entry-bearing input.
   (Auto-detection would otherwise prefer one of libxml2's many test executables.)
 - **`--static-libs all`** merges the *full* contents of every bitcode archive in
@@ -250,7 +254,7 @@ cd ziggy
 ### Step 2 — Run the analysis
 
 ```bash
-reachability run --lang ziggy --project examples/url -v
+reachability run --lang ziggy --project examples/url --clean -v
 ```
 
 What happens:
@@ -265,8 +269,8 @@ What happens:
   build, the bitcode already carries the same `cfg(fuzzing)`, optimization level,
   and instrumentation as the binary you instrument — so the reachable set lines
   up. `--profile release` adds `--release`; `--build-cmd` overrides the command
-  for a specific target/sanitizer/profile. Clean first (`cargo clean`, or pass
-  `--clean`) if the build is already cached, or no bitcode is emitted.
+  for a specific target/sanitizer/profile. The `--clean` above runs `cargo clean`
+  first, so a cached build can't leave the merge with stale or empty bitcode.
 
 ### Step 3 — Read the report
 
