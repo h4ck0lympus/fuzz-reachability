@@ -24,6 +24,7 @@ ReachResult computeReachability(Module &m, const CallGraph &g,
     }
     if (!res.reached.count(f)) {
       res.reached[f] = Via::Direct; // roots count as directly reached
+      res.depth[f] = 0;
       work.push(f);
     }
   }
@@ -40,6 +41,7 @@ ReachResult computeReachability(Module &m, const CallGraph &g,
       auto found = res.reached.find(callee);
       if (found == res.reached.end()) {
         res.reached[callee] = vk;
+        res.depth[callee] = res.depth[cur] + 1;
         work.push(callee);
       } else {
         found->second = mergeVia(found->second, vk);

@@ -14,7 +14,7 @@ is a bug.
 - Worked examples, step by step — a generic `LLVMFuzzerTestOneInput` harness for AFL++/libfuzzer (libxml2), a ziggy harness (the `url` crate), and cargo-afl harnesses (cpp_demangle and rustyknife) — [`docs/EXAMPLES.md`](docs/EXAMPLES.md)
 - LLVM version support — [`docs/llvm-support.md`](docs/llvm-support.md)
 
-Version: 1.0
+Version: 1.1-dev
 
 Author: Marc "vanHauser" Heuse
 
@@ -338,6 +338,20 @@ instrument: the optimization level, `cfg(fuzzing)`, feature flags, and
 `debug_assertions`/`overflow_checks` all change *which* functions are compiled,
 which wildcard `fun:` patterns cannot recover.
 
+**For `c`/`cpp` targets**, gllvm wraps the project's own build, so the bitcode
+inherits whatever optimization level that build sets — a `configure`/CMake
+default (often `-O2`), or none. The level governs **inlining**, which determines
+both the reachable set and the per-function metrics: when a callee is inlined its
+basic blocks, loops, locals (`C11`) and `dangerous_calls` fold into the caller,
+so an `-O3` `main` can report several times the counts of its source (see
+[Function metrics](#function-metrics)). **AFL++'s `afl-cc`/`afl-clang-fast`
+default to `-O3`** when the build passes no `-Ox`; sancov-based harnesses
+(libFuzzer, honggfuzz) use whatever `-Ox` you give their compiler. So when the
+fuzz binary is a default AFL++ build, analyze at `-O3` too — e.g.
+`CFLAGS=-O3 CXXFLAGS=-O3 reachability run …`, or set it at `configure` time.
+Analyzing `-O2` while fuzzing `-O3` (or vice versa) describes a slightly
+different binary than the one instrumented.
+
 **`libfuzzer`/`ziggy`/`afl` handle this automatically** by building through the
 fuzzer's own driver (`cargo fuzz build` / `cargo ziggy build --no-honggfuzz` /
 `cargo afl build`) with a `RUSTC_WRAPPER` that adds `--emit=llvm-bc`. So the
@@ -419,9 +433,15 @@ cannot recover a function that one build inlined away and the other did not.
 
 - **`<out>.json`** — `summary` counts (including `low_confidence`), a `reachable`
   array (mangled and demangled name, source file/line when debug info is present,
-  `via` = `direct`/`indirect`/`both`, an `indirect_only` flag, and a `confidence`
-  of `high`/`medium`/`low` — see [Confidence](#confidence)), and an
-  `unreachable_defined` array. With `--dot FILE`, also the reachable subgraph.
+  `via` = `direct`/`indirect`/`both`, an `indirect_only` flag, a `confidence`
+  of `high`/`medium`/`low` — see [Confidence](#confidence) — and a `depth`: the
+  fewest call-graph hops from the nearest entry, with entries at `0` and the
+  shortest path winning when several reach the same function), an
+  a set of per-function triage metrics — see [Function metrics](#function-metrics)),
+  an `unreachable_defined` array, and an `edges` array — the reachable call graph as
+  `{ "from", "to", "kind" }` objects (`kind` = `direct`/`indirect`), restricted to
+  edges whose endpoints are both reachable. With `--dot FILE`, also the reachable
+  subgraph in Graphviz form.
 - **`reached.txt`** — a SanitizerCoverage **allowlist** of reachable functions.
 - **`not_reached.txt`** — a SanitizerCoverage **ignorelist** of unreachable
   functions.
@@ -522,6 +542,40 @@ reached only via an inline-asm `call`, or invoked only as a startup constructor
 can rate `low`; conversely a true decoy whose address escapes to a real callable
 sink can rate `medium`. Treat `low` as "worth auditing", not "safe to remove".
 (See `driver/tests/test_analyzer_core.py::test_confidence_tiers`.)
+
+## Function metrics
+
+Each reachable function in the JSON carries a set of static triage signals to
+help decide where a fuzzing campaign should focus. Like `confidence`, these are
+hints, never verdicts — they do not change the reachable set or the coverage
+lists. They are computed on the same (optimized) bitcode the fuzz binary is built
+from, so the counts reflect post-inlining/optimization code, not source.
+
+- **`basic_blocks`** — number of basic blocks in the function.
+- **`cyclomatic`** — cyclomatic complexity, `edges - blocks + 2` (minimum `1`).
+- **`loops`** — number of natural loops (counts nested loops too).
+- **`dangerous_calls`** — number of call sites to known memory-unsafe functions
+  (`memcpy`/`memmove`/`memset` and the `llvm.mem*` intrinsics, `strcpy`/`strcat`
+  and friends, `sprintf` family, `gets`, `scanf` family, `alloca`, the
+  `malloc`/`calloc`/`realloc` allocators, …).
+- **`C11`** — number of local variables. From debug info (`DILocalVariable`
+  entries, excluding parameters) when the bitcode carries it; otherwise it falls
+  back to the count of `alloca` instructions. Build with `-g` for the accurate
+  source-level count, since optimization promotes most locals out of `alloca`s.
+- **`interesting`** (boolean) — the function takes at least one pointer argument
+  **and** lies on a call-graph path from an entry along which *every* function
+  also takes a pointer argument. It flags code the fuzzer's input (a pointer) can
+  plausibly be threaded into through an unbroken chain of pointer-passing calls. A
+  function with a pointer argument whose only callers are non-pointer-taking is
+  `false`.
+- **`bottleneck`** (boolean) — the function is the immediate dominator of at
+  least one other reachable function in the call graph rooted at the entries:
+  every path from an entry to that other function passes through it. A bottleneck
+  gates a region of the reachable graph, so leaving it uncovered leaves the whole
+  region uncovered — a high-value target for seeds or harness fixes.
+
+(See `driver/tests/test_analyzer_core.py::test_function_metrics_counts`,
+`::test_interesting_pointer_path`, and `::test_bottleneck_dominators`.)
 
 ## Historical note: the removed SVF backend
 

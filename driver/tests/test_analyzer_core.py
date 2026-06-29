@@ -12,6 +12,8 @@ from conftest import ll
 
 TWO = lambda: ll("two_funcs.ll")
 FNPTR = lambda: ll("fnptr.ll")
+DEPTH = lambda: ll("depth.ll")
+METRICS = lambda: ll("metrics.ll")
 
 
 def test_load_valid_ll(run_analyzer):
@@ -44,6 +46,86 @@ def test_json_output(run_analyzer):
     assert j["summary"]["reachable"] == 2
     assert int(j["llvm_version"]) >= 21  # min supported; newer LLVMs allowed
     assert j["backend"] == "type-based"
+
+
+def test_json_depth_min_path(run_analyzer):
+    r = run_analyzer([DEPTH(), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    j = json.loads(r.stdout)
+    depth = {f["mangled"]: f["depth"] for f in j["reachable"]}
+    assert depth["entry"] == 0
+    assert depth["mid"] == 1
+    assert depth["target"] == 1
+
+
+def test_json_edges_reachable_only(run_analyzer):
+    r = run_analyzer([FNPTR(), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    j = json.loads(r.stdout)
+    edges = {(e["from"], e["to"], e["kind"]) for e in j["edges"]}
+    assert ("entry", "opt_a", "indirect") in edges
+    assert ("entry", "opt_b", "indirect") in edges
+    reachable = {f["mangled"] for f in j["reachable"]}
+    for e in j["edges"]:
+        assert e["from"] in reachable and e["to"] in reachable
+    assert "other" not in {e["to"] for e in j["edges"]}
+    assert "take" not in {e["from"] for e in j["edges"]}
+
+
+def test_function_metrics_counts(run_analyzer):
+    r = run_analyzer([METRICS(), "--entry", "harness"])
+    assert r.returncode == 0, r.stderr
+    m = {f["mangled"]: f for f in json.loads(r.stdout)["reachable"]}
+    assert m["harness"]["basic_blocks"] == 3
+    assert m["harness"]["dangerous_calls"] == 1
+    assert m["harness"]["cyclomatic"] == 2
+    assert m["harness"]["loops"] == 0
+    assert m["a"]["basic_blocks"] == 3
+    assert m["a"]["loops"] == 1
+    assert m["a"]["cyclomatic"] == 2
+    assert m["c"]["C11"] == 2
+    assert m["d"]["dangerous_calls"] == 0
+
+
+def test_local_vars_from_debug_info(run_analyzer):
+    r = run_analyzer([ll("metrics_dbg.ll"), "--entry", "process"])
+    assert r.returncode == 0, r.stderr
+    m = {f["mangled"]: f for f in json.loads(r.stdout)["reachable"]}
+    assert m["process"]["C11"] == 3
+    assert m["process"]["dangerous_calls"] == 1
+    assert m["process"]["loops"] == 1
+
+
+def test_interesting_pointer_path(run_analyzer):
+    r = run_analyzer([METRICS(), "--entry", "harness"])
+    assert r.returncode == 0, r.stderr
+    m = {f["mangled"]: f for f in json.loads(r.stdout)["reachable"]}
+    assert m["harness"]["interesting"] is True
+    assert m["a"]["interesting"] is True
+    assert m["c"]["interesting"] is True
+    assert m["b"]["interesting"] is False
+    assert m["d"]["interesting"] is False
+
+
+def test_bottleneck_dominators(run_analyzer):
+    r = run_analyzer([METRICS(), "--entry", "harness"])
+    assert r.returncode == 0, r.stderr
+    m = {f["mangled"]: f for f in json.loads(r.stdout)["reachable"]}
+    assert m["harness"]["bottleneck"] is True
+    assert m["a"]["bottleneck"] is True
+    assert m["b"]["bottleneck"] is True
+    assert m["c"]["bottleneck"] is False
+    assert m["d"]["bottleneck"] is False
+
+
+def test_json_edges_reference_listed_nodes(run_analyzer):
+    r = run_analyzer([ll("callback_load.ll"), "--entry", "entry"])
+    assert r.returncode == 0, r.stderr
+    j = json.loads(r.stdout)
+    reachable = {f["mangled"] for f in j["reachable"]}
+    for e in j["edges"]:
+        assert e["from"] in reachable, f"dangling from: {e['from']}"
+        assert e["to"] in reachable, f"dangling to: {e['to']}"
 
 
 def test_typebased_indirect(run_analyzer):

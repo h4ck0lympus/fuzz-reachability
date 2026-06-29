@@ -4,6 +4,8 @@
 #include "llvm/IR/DebugInfoMetadata.h"
 #include "llvm/Support/JSON.h"
 #include <algorithm>
+#include <tuple>
+#include <vector>
 
 using namespace llvm;
 
@@ -38,7 +40,9 @@ const char *confidenceStr(Via via, bool hasFlow) {
 
 // Emit one function object. `via` is null for unreachable functions.
 void emitFn(json::OStream &J, Function *f, const Via *via,
-            const DenseSet<Function *> &flow) {
+            const DenseSet<Function *> &flow,
+            const DenseMap<Function *, unsigned> &depth,
+            const DenseMap<Function *, FuncMetrics> &metrics) {
   J.object([&] {
     J.attribute("mangled", f->getName());
     J.attribute("demangled", demangle(f->getName()));
@@ -53,14 +57,24 @@ void emitFn(json::OStream &J, Function *f, const Via *via,
       J.attribute("via", viaStr(*via));
       J.attribute("indirect_only", *via == Via::Indirect);
       J.attribute("confidence", confidenceStr(*via, flow.count(f)));
+      J.attribute("depth", (int64_t)depth.lookup(f));
+      const FuncMetrics &fm = metrics.lookup(f);
+      J.attribute("basic_blocks", (int64_t)fm.basicBlocks);
+      J.attribute("dangerous_calls", (int64_t)fm.dangerousCalls);
+      J.attribute("C11", (int64_t)fm.localVars);
+      J.attribute("cyclomatic", (int64_t)fm.cyclomatic);
+      J.attribute("loops", (int64_t)fm.loops);
+      J.attribute("interesting", fm.interesting);
+      J.attribute("bottleneck", fm.bottleneck);
     }
   });
 }
 } // namespace
 
-void writeJson(raw_ostream &os, Module &m, const CallGraph &, const ReachResult &res,
+void writeJson(raw_ostream &os, Module &m, const CallGraph &g, const ReachResult &res,
                StringRef backend, const std::vector<std::string> &entries,
-               const DenseSet<Function *> &flowTargets) {
+               const DenseSet<Function *> &flowTargets,
+               const DenseMap<Function *, FuncMetrics> &metrics) {
   // Defined functions, partitioned into reachable / unreachable, sorted by name.
   std::vector<std::pair<Function *, Via>> reachable;
   std::vector<Function *> unreachable;
@@ -105,11 +119,39 @@ void writeJson(raw_ostream &os, Module &m, const CallGraph &, const ReachResult 
     });
     J.attributeArray("reachable", [&] {
       for (auto &[f, via] : reachable)
-        emitFn(J, f, &via, flowTargets);
+        emitFn(J, f, &via, flowTargets, res.depth, metrics);
     });
     J.attributeArray("unreachable_defined", [&] {
       for (Function *f : unreachable)
-        emitFn(J, f, nullptr, flowTargets);
+        emitFn(J, f, nullptr, flowTargets, res.depth, metrics);
+    });
+    J.attributeArray("edges", [&] {
+      std::vector<std::tuple<StringRef, StringRef, EdgeKind>> edges;
+      for (auto &kv : g.edges()) {
+        Function *from = kv.first;
+        if (from->isDeclaration() || !res.reached.count(from))
+          continue;
+        for (auto &[to, kind] : kv.second)
+          if (!to->isDeclaration() && res.reached.count(to))
+            edges.emplace_back(from->getName(), to->getName(), kind);
+      }
+      std::sort(edges.begin(), edges.end(), [](const auto &a, const auto &b) {
+        if (std::get<0>(a) != std::get<0>(b))
+          return std::get<0>(a) < std::get<0>(b);
+        if (std::get<1>(a) != std::get<1>(b))
+          return std::get<1>(a) < std::get<1>(b);
+        return std::get<2>(a) < std::get<2>(b);
+      });
+      for (auto &e : edges) {
+        StringRef from = std::get<0>(e);
+        StringRef to = std::get<1>(e);
+        EdgeKind kind = std::get<2>(e);
+        J.object([&] {
+          J.attribute("from", from);
+          J.attribute("to", to);
+          J.attribute("kind", kind == EdgeKind::Direct ? "direct" : "indirect");
+        });
+      }
     });
   });
   os << "\n";

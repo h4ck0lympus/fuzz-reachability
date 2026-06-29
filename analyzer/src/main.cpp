@@ -3,6 +3,7 @@
 #include "Demangle.h"
 #include "DotExport.h"
 #include "JsonReport.h"
+#include "Metrics.h"
 #include "Module.h"
 #include "Reachability.h"
 #include "Toolchain.h"
@@ -317,6 +318,7 @@ int main(int argc, char **argv) {
   }
 
   auto flowTargets = reach::computeAddressFlowTargets(*mod);
+  auto metrics = reach::computeMetrics(*mod, graph, res, roots);
 
   auto writeFile = [&](const std::string &path, const char *what,
                        const std::function<void(raw_ostream &)> &fn) -> bool {
@@ -345,7 +347,8 @@ int main(int argc, char **argv) {
 
   const char *backendName = IndirectAny ? "indirect-any" : "type-based";
   if (OutFile.empty()) {
-    reach::writeJson(outs(), *mod, graph, res, backendName, entries, flowTargets);
+    reach::writeJson(outs(), *mod, graph, res, backendName, entries, flowTargets,
+                     metrics);
   } else {
     std::error_code ec;
     raw_fd_ostream out(OutFile, ec, sys::fs::OF_Text);
@@ -354,7 +357,8 @@ int main(int argc, char **argv) {
              << "\n";
       return 1;
     }
-    reach::writeJson(out, *mod, graph, res, backendName, entries, flowTargets);
+    reach::writeJson(out, *mod, graph, res, backendName, entries, flowTargets,
+                     metrics);
   }
   return 0;
 }

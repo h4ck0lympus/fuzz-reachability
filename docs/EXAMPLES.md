@@ -151,7 +151,8 @@ mangled name:
   "mangled": "_Z6ignorePvPKcz",
   "demangled": "ignore(void*, char const*, ...)",
   "via": "indirect",
-  "indirect_only": true
+  "indirect_only": true,
+  "depth": 2
 }
 ```
 
@@ -164,7 +165,15 @@ A directly-reached function carries its source location:
   "file": "parser.c",
   "line": 15376,
   "via": "direct",
-  "indirect_only": false
+  "indirect_only": false,
+  "depth": 1,
+  "basic_blocks": 4,
+  "dangerous_calls": 0,
+  "C11": 3,
+  "cyclomatic": 2,
+  "loops": 0,
+  "interesting": true,
+  "bottleneck": true
 }
 ```
 

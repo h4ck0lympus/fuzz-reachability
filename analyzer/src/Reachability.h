@@ -15,6 +15,7 @@ enum class Via { Direct, Indirect, Both };
 
 struct ReachResult {
   llvm::DenseMap<llvm::Function *, Via> reached;
+  llvm::DenseMap<llvm::Function *, unsigned> depth;
   std::vector<std::string> missingNames; // entry symbols that did not resolve
 };
 
